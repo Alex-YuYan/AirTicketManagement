@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Dialog, Transition } from '@headlessui/react';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
-const Register = () => {
+const CustomerRegisterButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -13,17 +13,15 @@ const Register = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    setIsOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+      <div className="relative mt-2">
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={() => setIsOpen(true)}
         >
-          Register
+          Customer Register
         </button>
         <Transition appear show={isOpen} as={React.Fragment}>
           <Dialog
@@ -31,7 +29,7 @@ const Register = () => {
             className="fixed inset-0 z-10 overflow-y-auto"
             onClose={() => setIsOpen(false)}
           >
-            <div className="min-h-screen px-4 text-center">
+            <div className="min-h-screen px-4 text-center z-30">
               <Transition.Child
                 as={React.Fragment}
                 enter="ease-out duration-300"
@@ -139,7 +137,7 @@ const Register = () => {
                     </div>
                     <div className="mt-6">
                       <button
-                        type="submit"
+                        type="button"
                         className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       >
                         Register
@@ -160,8 +158,7 @@ const Register = () => {
           </Dialog>
         </Transition>
       </div>
-    </div>
   );
 };
 
-export default Register;
+export default CustomerRegisterButton;
