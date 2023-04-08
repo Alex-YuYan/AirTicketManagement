@@ -18,7 +18,7 @@ const CustomerRegisterButton = () => {
     // md5 hash the password
     data.password = md5(data.password);
     try {
-      const response = await axios.post('/customer/register', data, { withCredentials: true })
+      const response = await axios.post('/customer/register', data)
       if (response.data.success === true) {
         alert('Registration successful, please log in.');
         setIsOpen(false);

@@ -1,13 +1,40 @@
 import { useState } from 'react';
 import { FaPlane } from 'react-icons/fa';
 import CustomerRegisterButton from './CustomerRegisterButton';
+import md5 from 'blueimp-md5';
+import axios from '../axios';
 
 const Landing = () => {
   const [loginType, setLoginType] = useState('customer');
+  const [info, setInfo] = useState({
+    email: '',
+    username: '',
+    password: '',
+  });
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('login');
+  const handleCustomerLogin = async () => {
+    const email = info.email;
+    const password = md5(info.password);
+
+    const data = {
+      "email": email,
+      "password": password
+    };
+
+    try {
+      const response = await axios.post('/customer/login', data)
+      if (response.data.success === true) {
+        alert('Sucessfully logged in!');
+      } else {
+        alert(response.data.error);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleChange = (e) => {
+    setInfo({ ...info, [e.target.id]: e.target.value });
   };
 
   return (
@@ -55,6 +82,7 @@ const Landing = () => {
                   id={loginType === 'customer' ? "email" : "username"}
                   type="text"
                   placeholder={loginType === 'customer' ? "Email" : "Username"}
+                  onChange={handleChange}
                 />
               </div>
               <div className="mb-6">
@@ -66,6 +94,7 @@ const Landing = () => {
                   id="password"
                   type="password"
                   placeholder="Password"
+                  onChange={handleChange}
                 />
               </div>
               {
@@ -74,6 +103,7 @@ const Landing = () => {
                     <button
                       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                       type="button"
+                      onClick={() => { handleCustomerLogin() }}
                     >
                       Customer Sign In
                     </button>

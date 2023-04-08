@@ -40,11 +40,14 @@ def login():
     email = request.json.get("email")
     password = request.json.get("password")
 
-    result = db.execute(query, {"email": email, "password": password}, fetch=True)
+    try:
+        result = db.execute(query, {"email": email, "password": password}, fetch=True)
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
     if len(result) == 1:
         session['customer_email'] = result[0]['email']
         return jsonify({"success": True})
-    return jsonify({"success": False})
+    return jsonify({"success": False, "error": "Invalid email or password"})
 
 @app.route("/customer/register", methods=["POST"])
 def customer_register():
