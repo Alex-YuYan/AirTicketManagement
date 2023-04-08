@@ -17,10 +17,20 @@ db.init_app(app)
 cors = cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-@app.route("/example")
-def example():
-    query = "SELECT * FROM Flight WHERE flight_number = :flight_number"
-    result = db.execute(query, {"flight_number": 211}, fetch=True)
+@app.route("/search/one-way/<dept_airport>/<arrival_airport>/<dept_date>", methods=["GET"])
+@cross_origin()
+def example(dept_airport, arrival_airport, dept_date):
+    query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
+
+    # Convert date in the format of YYYY-MM-DD to mysql datetime format
+    dept_date_next_day = dept_date + " 23:59:59"
+    dept_date = dept_date + " 00:00:00"
+    
+    result = db.execute(query, {"dept_airport": dept_airport, 
+                                "arrival_airport": arrival_airport, 
+                                "dept_date": dept_date, 
+                                "dept_date_next_day": dept_date_next_day},
+                        fetch=True)
     return jsonify(result)
 
 
