@@ -1,4 +1,6 @@
-from flask import Flask, jsonify
+from functools import wraps
+import hashlib
+from flask import Flask, jsonify, request, session
 from db import Database
 from flask_cors import CORS, cross_origin
 
@@ -10,6 +12,7 @@ app.config.from_mapping(
     DB_HOST="127.0.0.1",
     DB_PORT="8889",
 )
+app.secret_key = "flightmgr"
 
 db = Database()
 db.init_app(app)
@@ -17,9 +20,48 @@ db.init_app(app)
 cors = cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+'''
+    User Authentication Related
+'''
+def customer_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'customer_email' not in session:
+            # Return an empty JSON object and a 401 Unauthorized status code
+            return jsonify({}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/customer/login", methods=["POST"])
+@cross_origin()
+def login():
+    query = "SELECT * FROM Customer WHERE email = :email AND password = :password"
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+    # md5 encrypt the password and check against the database
+    password = hashlib.md5(password.encode()).hexdigest()
+
+    result = db.execute(query, {"email": email, "password": password}, fetch=True)
+    if len(result) == 1:
+        session['customer_email'] = result[0]['email']
+        return jsonify({"success": True})
+    return jsonify({"success": False})
+
+@app.route("/customer/logout", methods=["POST"])
+@cross_origin()
+@customer_login_required
+def logout():
+    session.pop('customer_email', None)
+    return jsonify({"success": True})
+
+'''
+    Customer Related
+'''
 @app.route("/search/one-way/<dept_airport>/<arrival_airport>/<dept_date>", methods=["GET"])
 @cross_origin()
-def example(dept_airport, arrival_airport, dept_date):
+@customer_login_required
+def search_oneway(dept_airport, arrival_airport, dept_date):
     query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
 
     # Convert date in the format of YYYY-MM-DD to mysql datetime format
