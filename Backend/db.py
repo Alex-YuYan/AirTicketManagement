@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
-# import logging
+import logging
 # logging.basicConfig()
-# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
 
 class Database:
     def __init__(self, app=None):
@@ -27,12 +27,17 @@ class Database:
         return f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}"
 
     def execute(self, query, params=None, fetch=False):
-        with self.db.engine.connect() as connection:
-            result_proxy = connection.execute(text(query), params)
-            if fetch:
-                rows = result_proxy.fetchall()
-                column_names = result_proxy.keys()
-                return [dict(zip(column_names, row)) for row in rows]
+        with self.db.engine.begin() as connection:
+            try:
+                result_proxy = connection.execute(text(query), params)
+                if fetch:
+                    rows = result_proxy.fetchall()
+                    column_names = result_proxy.keys()
+                    return [dict(zip(column_names, row)) for row in rows]
+                connection.commit()
+            except:
+                connection.rollback()
+                raise
         return []
 
     def teardown(self, exception):

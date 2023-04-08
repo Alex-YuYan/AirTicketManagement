@@ -1,6 +1,7 @@
 from functools import wraps
 import hashlib
 from flask import Flask, jsonify, request, session
+import sqlalchemy
 from db import Database
 from flask_cors import CORS, cross_origin
 
@@ -39,14 +40,29 @@ def login():
 
     email = request.form.get("email")
     password = request.form.get("password")
-    # md5 encrypt the password and check against the database
-    password = hashlib.md5(password.encode()).hexdigest()
 
     result = db.execute(query, {"email": email, "password": password}, fetch=True)
     if len(result) == 1:
         session['customer_email'] = result[0]['email']
         return jsonify({"success": True})
     return jsonify({"success": False})
+
+@app.route("/customer/register", methods=["POST"])
+@cross_origin()
+def register():
+    query = "INSERT INTO Customer (email, password, first_name, last_name) VALUES (:email, :password, :first_name, :last_name)"
+    # query = "INSERT INTO Customer (email) VALUES ('test@email.com')"
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+
+    try:
+        result = db.execute(query, {"email": email, "password": password, "first_name": first_name, "last_name": last_name})
+    except sqlalchemy.exc.IntegrityError as e:
+        return jsonify({"success": False, "error": "Email already exists, please just login"})
+    return jsonify({"success": True})
 
 @app.route("/customer/logout", methods=["POST"])
 @cross_origin()
