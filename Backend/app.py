@@ -18,7 +18,7 @@ app.secret_key = "flightmgr"
 db = Database()
 db.init_app(app)
 
-cors = cors = CORS(app)
+CORS(app, supports_credentials=True)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 '''
@@ -34,12 +34,11 @@ def customer_login_required(f):
     return decorated_function
 
 @app.route("/customer/login", methods=["POST"])
-@cross_origin()
 def login():
     query = "SELECT * FROM Customer WHERE email = :email AND password = :password"
 
-    email = request.form.get("email")
-    password = request.form.get("password")
+    email = request.json.get("email")
+    password = request.json.get("password")
 
     result = db.execute(query, {"email": email, "password": password}, fetch=True)
     if len(result) == 1:
@@ -48,15 +47,14 @@ def login():
     return jsonify({"success": False})
 
 @app.route("/customer/register", methods=["POST"])
-@cross_origin()
-def register():
+def customer_register():
     query = "INSERT INTO Customer (email, password, first_name, last_name) VALUES (:email, :password, :first_name, :last_name)"
     # query = "INSERT INTO Customer (email) VALUES ('test@email.com')"
 
-    email = request.form.get("email")
-    password = request.form.get("password")
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
+    email = request.json.get("email")
+    password = request.json.get("password")
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
 
     try:
         result = db.execute(query, {"email": email, "password": password, "first_name": first_name, "last_name": last_name})
@@ -65,7 +63,6 @@ def register():
     return jsonify({"success": True})
 
 @app.route("/customer/logout", methods=["POST"])
-@cross_origin()
 @customer_login_required
 def logout():
     session.pop('customer_email', None)
@@ -75,7 +72,6 @@ def logout():
     Customer Related
 '''
 @app.route("/search/one-way/<dept_airport>/<arrival_airport>/<dept_date>", methods=["GET"])
-@cross_origin()
 @customer_login_required
 def search_oneway(dept_airport, arrival_airport, dept_date):
     query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
