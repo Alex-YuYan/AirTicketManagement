@@ -6,7 +6,7 @@ import AuthContext from '../Auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
 
-const CustomerDashboard = () => {
+const StaffDashboard = () => {
   let [isOpen, setIsOpen] = useState(false);
   const nav = useNavigate();
   const { setLoggedIn, userFirstName, userLastName } = useContext(AuthContext);
@@ -96,4 +96,4 @@ const CustomerDashboard = () => {
   );
 };
 
-export default CustomerDashboard
+export default StaffDashboard

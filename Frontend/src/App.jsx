@@ -10,8 +10,9 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route element={<RequireAuth />}>
-        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+        <Route path="/customerDashboard" element={<CustomerDashboard />} />
       </Route>
+      <Route path="*" element={<h1>404</h1>} />
     </Routes>
   )
 };
