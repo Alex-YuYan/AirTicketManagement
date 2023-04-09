@@ -3,6 +3,7 @@ import { FaPlane } from 'react-icons/fa';
 import CustomerRegisterButton from './CustomerRegisterButton';
 import md5 from 'blueimp-md5';
 import axios from '../axios';
+import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const [loginType, setLoginType] = useState('customer');
@@ -11,6 +12,7 @@ const Landing = () => {
     username: '',
     password: '',
   });
+  const nav = useNavigate();
 
   const handleCustomerLogin = async () => {
     const email = info.email;
@@ -24,7 +26,8 @@ const Landing = () => {
     try {
       const response = await axios.post('/customer/login', data)
       if (response.data.success === true) {
-        alert('Sucessfully logged in!');
+        // alert('Sucessfully logged in!');
+        window.location.href = '/customer-dashboard';
       } else {
         alert(response.data.error);
       }

@@ -87,7 +87,10 @@ def customer_register():
 @app.route("/customer/logout", methods=["POST"])
 @customer_login_required
 def logout():
-    session.pop('customer_email', None)
+    try:
+        session.clear()
+    except Exception as e:
+        return jsonify({"success": False})
     return jsonify({"success": True})
 
 '''
