@@ -33,6 +33,23 @@ def customer_login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def staff_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'staff_username' not in session:
+            # Return an empty JSON object and a 401 Unauthorized status code
+            return jsonify({}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/verifyLogin", methods=["GET"])
+def verify_login():
+    if 'customer_email' in session:
+        return jsonify({"success": True, "email": session['customer_email'], "role": "customer", "first_name": session['first_name'], "last_name": session['last_name']})
+    elif 'staff_username' in session:
+        return jsonify({"success": True, "username": session['staff_username'], "role": "staff"})
+    return jsonify({"success": False})
+
 @app.route("/customer/login", methods=["POST"])
 def login():
     query = "SELECT * FROM Customer WHERE email = :email AND password = :password"
@@ -46,6 +63,8 @@ def login():
         return jsonify({"success": False, "error": "database error"})
     if len(result) == 1:
         session['customer_email'] = result[0]['email']
+        session['first_name'] = result[0]['first_name']
+        session['last_name'] = result[0]['last_name']
         return jsonify({"success": True})
     return jsonify({"success": False, "error": "Invalid email or password"})
 
