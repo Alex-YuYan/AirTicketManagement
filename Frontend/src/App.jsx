@@ -4,6 +4,7 @@ import Landing from './Pages/Landing';
 import CustomerDashboard from './Pages/CustomerDashboard';
 import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Auth/RequireAuth';
+import NotFound from './Pages/NotFound';
 
 const App = () => {
   return (
@@ -12,9 +13,9 @@ const App = () => {
       <Route element={<RequireAuth />}>
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
       </Route>
-      <Route path="*" element={<h1>404</h1>} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 };
 
-export default App
+export default App;
