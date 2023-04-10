@@ -28,7 +28,7 @@ const Landing = () => {
       const response = await axios.post('/customer/login', data)
       if (response.data.success === true) {
         // alert('Sucessfully logged in!');
-        window.location.href = '/customer-dashboard';
+        window.location.href = '/customerDashboard';
       } else {
         alert(response.data.error);
       }
