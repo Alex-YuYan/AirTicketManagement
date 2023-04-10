@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
+import axios from '../axios';
+import FlightCard from '../Components/FlightCard';
 
 const FlightSearch = () => {
   const [source, setSource] = useState('');
@@ -11,22 +13,34 @@ const FlightSearch = () => {
   const [airlineName, setAirlineName] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
   const [statusDate, setStatusDate] = useState('');
+  const [flightsData, setFlightsData] = useState([]);
+  const [searched, setSearched] = useState(false);
 
   const currentDate = new Date();
   const minDate = currentDate.toISOString().split('T')[0];
 
-  const checkDates = useEffect(() => {
-    if (departureDate < minDate) {
-      setDepartureDate(minDate);
-    } else if (departureDate > returnDate) {
-      setReturnDate(departureDate);
-    } else if (returnDate < minDate) {
-      setReturnDate(minDate);
-    }
-  }, [departureDate, returnDate]);
+  // const checkDates = useEffect(() => {
+  //   if (departureDate < minDate) {
+  //     setDepartureDate(minDate);
+  //   } else if (departureDate > returnDate) {
+  //     setReturnDate(departureDate);
+  //   } else if (returnDate < minDate) {
+  //     setReturnDate(minDate);
+  //   }
+  // }, [departureDate, returnDate]);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log(source, destination, departureDate, returnDate, tripType);
+    const response = await axios.get('/search/one-way', {
+      params: {
+        dept_airport: source,
+        arrival_airport: destination,
+        dept_date: departureDate
+      }
+    });
+    console.log(response);
+    setFlightsData(response.data);
+    setSearched(true);
   };
 
   const handleFlightStatus = () => {
@@ -43,7 +57,7 @@ const FlightSearch = () => {
               <Tab
                 className={({ selected }) =>
                   selected
-                    ? 'bg-white rounded-full text-amber-500 w-1/2 text-center'
+                    ? 'bg-white rounded-full text-black w-1/2 text-center'
                     : 'text-white hover:text-amber-400 w-1/2 text-center'
                 }
               >
@@ -52,7 +66,7 @@ const FlightSearch = () => {
               <Tab
                 className={({ selected }) =>
                   selected
-                    ? 'bg-white rounded-full text-amber-500 w-1/2 text-center'
+                    ? 'bg-white rounded-full text-black w-1/2 text-center'
                     : 'text-white hover:text-amber-400 w-1/2 text-center'
                 }
               >
@@ -132,6 +146,18 @@ const FlightSearch = () => {
                   <IoSearch className="mr-2" />
                   Search Flights
                 </button>
+                {
+                  flightsData.length > 0 ?
+                  <div className="container mx-auto p-4">
+                    <h1 className="text-3xl font-bold mb-6">Flights</h1>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {flightsData.map((flight, index) => (
+                        <FlightCard key={index} flight={flight} />
+                      ))}
+                    </div>
+                  </div>
+                  : searched && <h1 className="text-2xl font-bold mt-4 text-red-500">No Flights Found for Given Information</h1>
+                }
               </Tab.Panel>
               <Tab.Panel>
                 <div className="mt-8">

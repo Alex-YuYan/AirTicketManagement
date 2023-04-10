@@ -96,11 +96,14 @@ def logout():
 '''
     Customer Related
 '''
-@app.route("/search/one-way/<dept_airport>/<arrival_airport>/<dept_date>", methods=["GET"])
+@app.route("/search/one-way", methods=["GET"])
 @customer_login_required
-def search_oneway(dept_airport, arrival_airport, dept_date):
+def search_oneway():
     query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
 
+    dept_date = request.args.get("dept_date")
+    dept_airport = request.args.get("dept_airport")
+    arrival_airport = request.args.get("arrival_airport")
     # Convert date in the format of YYYY-MM-DD to mysql datetime format
     dept_date_next_day = dept_date + " 23:59:59"
     dept_date = dept_date + " 00:00:00"
@@ -110,6 +113,7 @@ def search_oneway(dept_airport, arrival_airport, dept_date):
                                 "dept_date": dept_date, 
                                 "dept_date_next_day": dept_date_next_day},
                         fetch=True)
+    print(jsonify(result))
     return jsonify(result)
 
 
