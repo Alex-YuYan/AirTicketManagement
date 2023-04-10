@@ -94,7 +94,7 @@ def logout():
     return jsonify({"success": True})
 
 '''
-    Customer Related
+    Customer Action Related
 '''
 @app.route("/search/one-way", methods=["GET"])
 @customer_login_required
@@ -116,6 +116,24 @@ def search_oneway():
     print(jsonify(result))
     return jsonify(result)
 
+@app.route("/customer/flights", methods=["GET"])
+@customer_login_required
+def get_customer_flights():
+    query = '''
+        SELECT Flight.*
+        FROM Flight
+        INNER JOIN Ticket ON Ticket.flight_number = Flight.flight_number
+            AND Ticket.dept_date_time = Flight.dept_date_time
+            AND Ticket.airline_name = Flight.airline_name
+        WHERE Ticket.email = :email
+    '''
+    email = request.args.get('email')
+    
+    try:
+        result = db.execute(query, {"email": email}, fetch=True)
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    return jsonify({"success": True, "flights": result})
 
 if __name__ == "__main__":
     app.run(debug=True)

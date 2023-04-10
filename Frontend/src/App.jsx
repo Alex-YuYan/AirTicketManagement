@@ -6,6 +6,7 @@ import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Auth/RequireAuth';
 import NotFound from './Pages/NotFound';
 import FlightSearch from './Pages/FlightSearch';
+import CustomerFlights from './Pages/CustomerFlights';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
       <Route path="/publicSearch" element={<FlightSearch />} />
       <Route element={<RequireAuth />}>
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
+        <Route path="/customerFlights" element={<CustomerFlights />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
