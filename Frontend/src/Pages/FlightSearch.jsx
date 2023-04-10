@@ -59,7 +59,7 @@ const FlightSearch = () => {
             <div className="cursor-pointer" onClick={() => navigate("/customerDashboard")}>
               <BiArrowBack className="text-3xl text-gray-800" />
             </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">Flight Search</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">Flight Search</h1>
           </div>
           <Tab.Group>
             <Tab.List className="flex p-1 space-x-0 bg-green-500 rounded-full text-xl">
@@ -116,97 +116,103 @@ const FlightSearch = () => {
                     </Menu.Item>
                   </Menu.Items>
                 </Menu>
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Source"
-                    value={source}
-                    onChange={(e) => setSource(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-md"
-                    required={true}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Destination"
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-md"
-                    required={true}
-                  />
-                  <input
-                    type="date"
-                    value={departureDate}
-                    onChange={(e) => setDepartureDate(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-md"
-                    min={minDate}
-                    required={true}
-                  />
-                  {tripType === 'round-trip' && (
+                <form>
+                  <div className="mt-4 grid grid-cols-2 gap-4">
                     <input
-                      type="date"
-                      value={returnDate}
-                      onChange={(e) => setReturnDate(e.target.value)}
+                      type="text"
+                      placeholder="Source"
+                      value={source}
+                      onChange={(e) => setSource(e.target.value)}
                       className="border border-gray-300 p-2 rounded-md"
-                      min={departureDate || minDate}
                       required={true}
                     />
-                  )}
-                </div>
-                <button
-                  onClick={handleSearch}
-                  className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
-                >
-                  <IoSearch className="mr-2" />
-                  Search Flights
-                </button>
+                    <input
+                      type="text"
+                      placeholder="Destination"
+                      value={destination}
+                      onChange={(e) => setDestination(e.target.value)}
+                      className="border border-gray-300 p-2 rounded-md"
+                      required={true}
+                    />
+                    <input
+                      type="date"
+                      value={departureDate}
+                      onChange={(e) => setDepartureDate(e.target.value)}
+                      className="border border-gray-300 p-2 rounded-md"
+                      min={minDate}
+                      required={true}
+                    />
+                    {tripType === 'round-trip' && (
+                      <input
+                        type="date"
+                        value={returnDate}
+                        onChange={(e) => setReturnDate(e.target.value)}
+                        className="border border-gray-300 p-2 rounded-md"
+                        min={departureDate || minDate}
+                        required={true}
+                      />
+                    )}
+                  </div>
+                  <button
+                    onSubmit={handleSearch}
+                    className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
+                    type='submit'
+                  >
+                    <IoSearch className="mr-2" />
+                    Search Flights
+                  </button>
+                </form>
                 {
                   flightsData.length > 0 ?
-                  <div className="container mx-auto p-4">
-                    <h1 className="text-3xl font-bold mb-6">Flights</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {flightsData.map((flight, index) => (
-                        <FlightCard key={index} flight={flight} />
-                      ))}
+                    <div className="container mx-auto p-4">
+                      <h1 className="text-3xl font-bold mb-6">Flights</h1>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {flightsData.map((flight, index) => (
+                          <FlightCard key={index} flight={flight} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  : searched && <h1 className="text-2xl font-bold mt-4 text-red-500">No Flights Found for Given Information</h1>
+                    : searched && <h1 className="text-2xl font-bold mt-4 text-red-500">No Flights Found for Given Information</h1>
                 }
               </Tab.Panel>
               <Tab.Panel>
                 <div className="mt-8">
-                  <div className="grid grid-cols-3 gap-4 mt-5">
-                    <input
-                      type="text"
-                      placeholder="Airline Name"
-                      value={airlineName}
-                      onChange={(e) => setAirlineName(e.target.value)}
-                      className="border border-gray-300 p-2 rounded-md"
-                      required={true}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Flight Number"
-                      value={flightNumber}
-                      onChange={(e) => setFlightNumber(e.target.value)}
-                      className="border border-gray-300 p-2 rounded-md"
-                      required={true}
-                    />
-                    <input
-                      type="date"
-                      value={statusDate}
-                      onChange={(e) => setStatusDate(e.target.value)}
-                      min={minDate}
-                      className="border border-gray-300 p-2 rounded-md"
-                      required={true}
-                    />
-                  </div>
-                  <button
-                    onClick={handleFlightStatus}
-                    className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
-                  >
-                    <IoSearch className="mr-2" />
-                    Check Status
-                  </button>
+                  <form>
+                    <div className="grid grid-cols-3 gap-4 mt-5">
+                      <input
+                        type="text"
+                        placeholder="Airline Name"
+                        value={airlineName}
+                        onChange={(e) => setAirlineName(e.target.value)}
+                        className="border border-gray-300 p-2 rounded-md"
+                        required={true}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Flight Number"
+                        value={flightNumber}
+                        onChange={(e) => setFlightNumber(e.target.value)}
+                        className="border border-gray-300 p-2 rounded-md"
+                        required={true}
+                      />
+                      <input
+                        type="date"
+                        value={statusDate}
+                        onChange={(e) => setStatusDate(e.target.value)}
+                        min={minDate}
+                        className="border border-gray-300 p-2 rounded-md"
+                        required={true}
+                      />
+                    </div>
+                    <button
+                      onSubmit={handleFlightStatus}
+                      className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
+                      type='submit'
+                    >
+                      <IoSearch className="mr-2" />
+                      Check Status
+                    </button>
+                  </form>
                 </div>
               </Tab.Panel>
             </Tab.Panels>

@@ -53,15 +53,15 @@ const Landing = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="flex items-center justify-between p-4 bg-blue-500 text-white">
+    <div className="flex flex-col h-screen w-full bg-cover bg-no-repeat bg-center" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/07455/ph-bkd-klm-royal-dutch-airlines-boeing-787-10-dreamliner_PlanespottersNet_1323213_d1b8914d2e_o.jpg)` }}>
+      <header className="flex items-center justify-between p-4 bg-gradient-to-t from-transparent to-blue-300 text-white">
         <h1 className="text-2xl font-bold">
           <FaPlane className="inline-block mr-2" />
           Air Ticket Management System
         </h1>
       </header>
       <main className="flex flex-grow relative">
-        <section className="w-1/2 absolute z-10 left-0 flex flex-col items-center justify-center p-6 mt-[20vh]">
+        <section className="w-2/3 absolute z-10 left-0 flex flex-col items-center justify-center p-6 mt-[20vh]">
           <div className="flex items-start">
             <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-md">
               <div className="flex justify-center">
@@ -151,10 +151,6 @@ const Landing = () => {
             </button>
           </div>
         </section>
-        <section
-          className="w-full bg-cover bg-no-repeat bg-center"
-          style={{ backgroundImage: `url(https://cdn.plnspttrs.net/07455/ph-bkd-klm-royal-dutch-airlines-boeing-787-10-dreamliner_PlanespottersNet_1323213_d1b8914d2e_o.jpg)` }}
-        ></section>
       </main>
     </div>
   );
