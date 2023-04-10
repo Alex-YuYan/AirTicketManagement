@@ -97,7 +97,6 @@ def logout():
     Customer Action Related
 '''
 @app.route("/search/one-way", methods=["GET"])
-@customer_login_required
 def search_oneway():
     query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
 
