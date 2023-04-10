@@ -8,7 +8,7 @@ import axios from '../axios';
 
 const CustomerDashboard = () => {
   let [isOpen, setIsOpen] = useState(false);
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const { setLoggedIn, userFirstName, userLastName } = useContext(AuthContext);
 
   const handleLogout = async () => {
@@ -17,7 +17,7 @@ const CustomerDashboard = () => {
       setLoggedIn(false);
       setIsOpen(false);
       alert('You have been logged out.');
-      nav('/');
+      naviagte('/');
     } else {
       alert('Something went wrong.');
     }
@@ -40,7 +40,7 @@ const CustomerDashboard = () => {
                 <FaPlane className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">My Flights</span>
               </button>
-              <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md">
+              <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/publicSearch")}>
                 <FaSearch className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Search / Booking</span>
               </button>

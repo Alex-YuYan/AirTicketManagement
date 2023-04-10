@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
+import { BiArrowBack } from 'react-icons/bi';
 import axios from '../axios';
 import FlightCard from '../Components/FlightCard';
+import { useNavigate } from 'react-router-dom';
 
 const FlightSearch = () => {
   const [source, setSource] = useState('');
@@ -15,6 +17,8 @@ const FlightSearch = () => {
   const [statusDate, setStatusDate] = useState('');
   const [flightsData, setFlightsData] = useState([]);
   const [searched, setSearched] = useState(false);
+
+  const navigate = useNavigate();
 
   const currentDate = new Date();
   const minDate = currentDate.toISOString().split('T')[0];
@@ -51,7 +55,12 @@ const FlightSearch = () => {
     <div className="min-h-screen bg-gradient-to-tr from-amber-400 to-cyan-500 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative w-2/3 mx-auto">
         <div className="bg-white p-6 rounded-lg">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Flight Search</h1>
+          <div className="flex justify-center">
+            <div className="cursor-pointer" onClick={() => navigate("/")}>
+              <BiArrowBack className="text-3xl text-gray-800" />
+            </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">Flight Search</h1>
+          </div>
           <Tab.Group>
             <Tab.List className="flex p-1 space-x-0 bg-green-500 rounded-full text-xl">
               <Tab

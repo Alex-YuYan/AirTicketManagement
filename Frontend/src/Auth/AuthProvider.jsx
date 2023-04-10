@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
           const res = await axios.get("/verifyLogin")
           if (res.data && res.data.success === true) {
             setLoggedIn(true)
-            setUserRole(res.data.userRole)
-            if (res.data.userRole === 'customer') {
+            setUserRole(res.data.role)
+            if (res.data.role === 'customer') {
               setUserId(res.data.email)
             } else {
               setUserId(res.data.username)

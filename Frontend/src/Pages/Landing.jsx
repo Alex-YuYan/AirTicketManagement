@@ -1,19 +1,30 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FaPlane } from 'react-icons/fa';
 import { FiArrowRight } from 'react-icons/fi';
 import CustomerRegisterButton from './CustomerRegisterButton';
 import md5 from 'blueimp-md5';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../Auth/AuthProvider';
 
 const Landing = () => {
   const [loginType, setLoginType] = useState('customer');
+  const { loggedIn, userRole } = useContext(AuthContext);
   const [info, setInfo] = useState({
     email: '',
     username: '',
     password: '',
   });
-  const nav = useNavigate();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loggedIn === true) {
+      if (userRole === 'customer') {
+        navigate('/customerDashboard');
+      } else {
+      }
+    }
+  }, [loggedIn, userRole]);
 
   const handleCustomerLogin = async () => {
     const email = info.email;
@@ -133,7 +144,7 @@ const Landing = () => {
               }
             </div>
             <button
-              className="flex items-center justify-between bg-white shadow-md rounded-md px-4 py-2 space-x-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-indigo-500 ml-4" onClick={() => nav('/publicSearch')}
+              className="flex items-center justify-between bg-white shadow-md rounded-md px-4 py-2 space-x-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-indigo-500 ml-4" onClick={() => navigate('/publicSearch')}
             >
               <span>Search Flights without <br></br> Logging In</span>
               <FiArrowRight className="text-blue-500 text-4xl" />
