@@ -31,6 +31,8 @@ def get_ticket_price(flight_number, dept_date_time, airline_name):
     currentNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
     query = "SELECT num_seat FROM Airplane WHERE airplane_id = (SELECT airplane_id FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name)"
     totalNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    if len(currentNum) == 0 or len(totalNum) == 0:
+        return 0
     if float(currentNum[0]['COUNT(*)']) >= float(totalNum[0]['num_seat']) * 0.8:
         query = "SELECT base_price * 1.25 AS price FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
     else :
@@ -130,6 +132,8 @@ def search_oneway():
                                 "dept_date": dept_date, 
                                 "dept_date_next_day": dept_date_next_day},
                         fetch=True)
+        if len(result) == 0:
+            return jsonify({"success": False, "error": "No flight found"})
         price = get_ticket_price(result[0]['flight_number'], result[0]['dept_date_time'], result[0]['airline_name'])
         result[0]['price'] = float(price)
         print(result)

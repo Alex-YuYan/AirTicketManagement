@@ -48,6 +48,8 @@ const CustomerSearch = () => {
         setSearched(true);
       } else {
         alert(response.data.error);
+        setSearched(true);
+        setFlightsData([]);
       }
     } catch (error) {
       console.log(error);

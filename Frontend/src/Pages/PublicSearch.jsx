@@ -48,6 +48,7 @@ const PublicSearch = () => {
         setSearched(true);
       } else {
         alert(response.data.error);
+        setSearched(true);
       }
     } catch (error) {
       console.log(error);
