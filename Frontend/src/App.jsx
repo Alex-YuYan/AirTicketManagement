@@ -5,17 +5,19 @@ import CustomerDashboard from './Pages/CustomerDashboard';
 import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Auth/RequireAuth';
 import NotFound from './Pages/NotFound';
-import FlightSearch from './Pages/FlightSearch';
 import CustomerFlights from './Pages/CustomerFlights';
+import PublicSearch from './Pages/PublicSearch';
+import CustomerSearch from './Pages/CustomerSearch';
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
-      <Route path="/publicSearch" element={<FlightSearch />} />
+      <Route path="/publicSearch" element={<PublicSearch />} />
       <Route element={<RequireAuth />}>
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
         <Route path="/customerFlights" element={<CustomerFlights />} />
+        <Route path='/customerSearch' element={<CustomerSearch />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

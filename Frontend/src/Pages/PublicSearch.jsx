@@ -6,7 +6,7 @@ import axios from '../axios';
 import FlightCard from '../Components/FlightCard';
 import { useNavigate } from 'react-router-dom';
 
-const FlightSearch = () => {
+const PublicSearch = () => {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState('');
@@ -56,7 +56,7 @@ const FlightSearch = () => {
       <div className="relative w-2/3 mx-auto">
         <div className="bg-gray-100 p-6 rounded-lg">
           <div className="flex justify-center">
-            <div className="cursor-pointer" onClick={() => navigate("/customerDashboard")}>
+            <div className="cursor-pointer" onClick={() => navigate("/")}>
               <BiArrowBack className="text-3xl text-gray-800" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">Flight Search</h1>
@@ -154,9 +154,9 @@ const FlightSearch = () => {
                     )}
                   </div>
                   <button
-                    onSubmit={handleSearch}
+                    onClick={handleSearch}
                     className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
-                    type='submit'
+                    type='button'
                   >
                     <IoSearch className="mr-2" />
                     Search Flights
@@ -205,9 +205,9 @@ const FlightSearch = () => {
                       />
                     </div>
                     <button
-                      onSubmit={handleFlightStatus}
+                      onClick={handleFlightStatus}
                       className="w-full mt-4 p-2 bg-blue-500 text-white rounded-md flex justify-center items-center hover:bg-blue-600"
-                      type='submit'
+                      type='button'
                     >
                       <IoSearch className="mr-2" />
                       Check Status
@@ -223,4 +223,4 @@ const FlightSearch = () => {
   );
 };
 
-export default FlightSearch;
+export default PublicSearch;

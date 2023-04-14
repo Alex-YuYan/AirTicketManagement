@@ -40,7 +40,7 @@ const CustomerDashboard = () => {
                 <FaPlane className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">My Flights</span>
               </button>
-              <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/publicSearch")}>
+              <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/customerSearch")}>
                 <FaSearch className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Booking</span>
               </button>
