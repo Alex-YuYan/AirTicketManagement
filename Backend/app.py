@@ -1,3 +1,4 @@
+from datetime import datetime, time
 from functools import wraps
 import hashlib
 from flask import Flask, jsonify, request, session
@@ -183,6 +184,42 @@ def get_customer_flights():
         return jsonify({"success": False, "error": "database error"})
     return jsonify({"success": True, "flights": result})
 
+@app.route("/customer/purchase", methods=["POST"])
+@customer_login_required
+def purchase_ticket():
+    query = '''
+        INSERT INTO Ticket (
+            email, id, purchase_date_time, airline_name, flight_number, dept_date_time,
+            card_type, card_number, name_card, card_expiration, price
+        ) VALUES (
+            :email, :id, :purchase_date_time, :airline_name, :flight_number, :dept_date_time,
+            :card_type, :card_number, :card_name, :card_expiration, :price
+        )
+    '''
+
+    email = session['customer_email']
+    ticket_id = hashlib.md5(str(datetime.now()).encode('utf-8')).hexdigest()
+    purchase_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    airline_name = request.json.get("airline_name")
+    flight_number = request.json.get("flight_number")
+    dept_date_time = datetime.strptime(request.json.get("dept_date_time"), "%a, %d %b %Y %H:%M:%S %Z").strftime("%Y-%m-%d %H:%M:%S")
+    card_type = request.json.get("card_type")
+    card_number = request.json.get("card_number")
+    card_name = request.json.get("card_name")
+    card_expiration = request.json.get("card_expiration")
+    price = get_ticket_price(flight_number, dept_date_time, airline_name)
+    
+    try:
+        db.execute(query, {
+            "email": email, "id": ticket_id, "purchase_date_time": purchase_time,
+            "airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time,
+            "card_type": card_type, "card_number": card_number, "card_name": card_name,
+            "card_expiration": card_expiration, "price": price
+        })
+        return jsonify({"success": True})
+    except sqlalchemy.exc.IntegrityError as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
 
 if __name__ == "__main__":
     app.run(debug=True)

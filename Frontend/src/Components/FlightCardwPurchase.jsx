@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaPlaneDeparture, FaPlaneArrival } from 'react-icons/fa';
+import PurchaseButton from './PurchaseButton';
 
 const FlightCardwPurchase = ({ flight }) => {
   return (
@@ -28,9 +29,7 @@ const FlightCardwPurchase = ({ flight }) => {
         <p className="text-lg text-orange-600 font-semibold">${flight.price}</p>
       </div>
       <div className="flex justify-end">
-        <button className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-md shadow-md">
-          Purchase
-        </button>
+        <PurchaseButton flight={flight}/>
       </div>
     </div>
   );
