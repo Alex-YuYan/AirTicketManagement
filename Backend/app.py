@@ -21,6 +21,23 @@ db.init_app(app)
 CORS(app, supports_credentials=True)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+
+'''
+    Helper Functions
+'''
+def get_ticket_price(flight_number, dept_date_time, airline_name):
+    # if flight is 80% full, price is 1.25x base price
+    query = "SELECT COUNT(*) FROM Ticket WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
+    currentNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    query = "SELECT num_seat FROM Airplane WHERE airplane_id = (SELECT airplane_id FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name)"
+    totalNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    if float(currentNum[0]['COUNT(*)']) >= float(totalNum[0]['num_seat']) * 0.8:
+        query = "SELECT base_price * 1.25 AS price FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
+    else :
+        query = "SELECT base_price AS price FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
+    price = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    return price[0]['price']
+
 '''
     User Authentication Related
 '''
@@ -107,13 +124,19 @@ def search_oneway():
     dept_date_next_day = dept_date + " 23:59:59"
     dept_date = dept_date + " 00:00:00"
     
-    result = db.execute(query, {"dept_airport": dept_airport, 
+    try:
+        result = db.execute(query, {"dept_airport": dept_airport, 
                                 "arrival_airport": arrival_airport, 
                                 "dept_date": dept_date, 
                                 "dept_date_next_day": dept_date_next_day},
                         fetch=True)
-    print(jsonify(result))
-    return jsonify(result)
+        price = get_ticket_price(result[0]['flight_number'], result[0]['dept_date_time'], result[0]['airline_name'])
+        result[0]['price'] = float(price)
+        print(result)
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
+    return jsonify({"success": True, "flights": result})
 
 @app.route("/customer/flights", methods=["GET"])
 @customer_login_required
@@ -133,6 +156,7 @@ def get_customer_flights():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     return jsonify({"success": True, "flights": result})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

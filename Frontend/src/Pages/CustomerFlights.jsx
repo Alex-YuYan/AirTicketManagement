@@ -17,7 +17,6 @@ const CustomerFlights = () => {
           alert(res.data.error)
         } else {
           setFlights(res.data.flights)
-          console.log(res.data.flights)
         }
       } catch (error) {
         console.error(error)

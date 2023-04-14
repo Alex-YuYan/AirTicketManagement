@@ -35,9 +35,9 @@ class Database:
                     column_names = result_proxy.keys()
                     return [dict(zip(column_names, row)) for row in rows]
                 connection.commit()
-            except:
+            except Exception as e:
                 connection.rollback()
-                raise
+                raise e
         return []
 
     def teardown(self, exception):

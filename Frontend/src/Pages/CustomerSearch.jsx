@@ -3,7 +3,7 @@ import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
 import { BiArrowBack } from 'react-icons/bi';
 import axios from '../axios';
-import FlightCard from '../Components/FlightCard';
+import FlightCardwPurchase from '../Components/FlightCardwPurchase';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerSearch = () => {
@@ -35,16 +35,23 @@ const CustomerSearch = () => {
 
   const handleSearch = async () => {
     // console.log(source, destination, departureDate, returnDate, tripType);
-    const response = await axios.get('/search/one-way', {
-      params: {
-        dept_airport: source,
-        arrival_airport: destination,
-        dept_date: departureDate
+    try {
+      const response = await axios.get('/search/one-way', {
+        params: {
+          dept_airport: source,
+          arrival_airport: destination,
+          dept_date: departureDate
+        }
+      });
+      if (response.data.success === true) {
+        setFlightsData(response.data.flights);
+        setSearched(true);
+      } else {
+        alert(response.data.error);
       }
-    });
-    // console.log(response);
-    setFlightsData(response.data);
-    setSearched(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleFlightStatus = () => {
@@ -166,9 +173,9 @@ const CustomerSearch = () => {
                   flightsData.length > 0 ?
                     <div className="container mx-auto p-4">
                       <h1 className="text-3xl font-bold mb-6">Flights</h1>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4">
                         {flightsData.map((flight, index) => (
-                          <FlightCard key={index} flight={flight} />
+                          <FlightCardwPurchase key={index} flight={flight} />
                         ))}
                       </div>
                     </div>

@@ -27,6 +27,11 @@ const FlightCard = ({ flight }) => {
         </p>
         <p className="text-lg text-orange-600 font-semibold">${flight.price}</p>
       </div>
+      <div className="flex justify-end">
+        <button className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-md shadow-md">
+          Purchase
+        </button>
+      </div>
     </div>
   );
 };
