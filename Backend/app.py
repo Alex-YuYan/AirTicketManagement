@@ -119,14 +119,14 @@ def search_oneway():
 @customer_login_required
 def get_customer_flights():
     query = '''
-        SELECT Flight.*
+        SELECT Flight.*, Ticket.id, Ticket.price
         FROM Flight
         INNER JOIN Ticket ON Ticket.flight_number = Flight.flight_number
             AND Ticket.dept_date_time = Flight.dept_date_time
             AND Ticket.airline_name = Flight.airline_name
         WHERE Ticket.email = :email
     '''
-    email = request.args.get('email')
+    email = session['customer_email']
     
     try:
         result = db.execute(query, {"email": email}, fetch=True)

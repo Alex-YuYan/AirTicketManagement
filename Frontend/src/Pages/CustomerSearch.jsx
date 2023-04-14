@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState} from 'react';
 import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
 import { BiArrowBack } from 'react-icons/bi';

@@ -1,13 +1,9 @@
 import React, { useEffect, useContext, useState } from 'react'
 import axios from '../axios';
-import AuthContext from '../Auth/AuthProvider';
-import { HiOutlineX } from 'react-icons/hi';
-import { AiOutlineStar as StarIcon } from 'react-icons/ai';
 import { BiArrowBack } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerFlights = () => {
-  const { userId } = useContext(AuthContext);
   const [flights, setFlights] = useState([])
   const navigate = useNavigate();
 
@@ -16,15 +12,12 @@ const CustomerFlights = () => {
   useEffect(() => {
     const getFlights = async () => {
       try {
-        const res = await axios.get('/customer/flights', {
-          params: {
-            email: userId
-          }
-        })
+        const res = await axios.get('/customer/flights')
         if (res.data && res.data.success === false) {
           alert(res.data.error)
         } else {
           setFlights(res.data.flights)
+          console.log(res.data.flights)
         }
       } catch (error) {
         console.error(error)
@@ -49,8 +42,11 @@ const CustomerFlights = () => {
           >
             <div className="flex justify-between items-start">
               <div className="text-xl font-semibold mb-2">
-                {flight.airline_name} - Flight {flight.flight_number}
+                {flight.airline_name} - {flight.flight_number}
               </div>
+            </div>
+            <div className="text-gray-600 mb-4">
+              Ticket ID: {flight.id}
             </div>
             <div className="text-gray-600 mb-4">
               Departure: {flight.dept_airport} - {flight.dept_date_time}
@@ -61,10 +57,10 @@ const CustomerFlights = () => {
             <div className="text-gray-600 mb-4">
               Status: {flight.status}
             </div>
-            <div className="text-gray-600 mb-4">
-              Base Price: ${flight.base_price}
+            <div className="text-gray-600 font-bold mb-4">
+              Price: ${flight.price}
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex justify-end">
               {
                 Date(flight.dept_date_time) > currentDate ?
                   <button className="bg-red-500 text-white font-semibold py-2 px-4 rounded-md">
