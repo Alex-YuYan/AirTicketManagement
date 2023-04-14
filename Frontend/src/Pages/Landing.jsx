@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { FaPlane } from 'react-icons/fa';
 import { FiArrowRight } from 'react-icons/fi';
-import CustomerRegisterButton from './CustomerRegisterButton';
+import CustomerRegisterButton from '../Components/CustomerRegisterButton';
 import md5 from 'blueimp-md5';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
