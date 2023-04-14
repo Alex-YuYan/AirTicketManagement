@@ -89,18 +89,40 @@ def login():
 
 @app.route("/customer/register", methods=["POST"])
 def customer_register():
-    query = "INSERT INTO Customer (email, password, first_name, last_name) VALUES (:email, :password, :first_name, :last_name)"
-    # query = "INSERT INTO Customer (email) VALUES ('test@email.com')"
+    query = """INSERT INTO Customer (
+        email, password, first_name, last_name, building, street_name, apt_number, city,
+        state, zipcode, passport_number, passport_expiration, passport_country, date_of_birth
+    ) VALUES (
+        :email, :password, :first_name, :last_name, :building, :street_name, :apt_number, :city,
+        :state, :zipcode, :passport_number, :passport_expiration, :passport_country, :date_of_birth
+    )"""
 
     email = request.json.get("email")
     password = request.json.get("password")
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
+    building = request.json.get("building")
+    street_name = request.json.get("street_name")
+    apt_number = request.json.get("apt_number")
+    city = request.json.get("city")
+    state = request.json.get("state")
+    zipcode = request.json.get("zipcode")
+    passport_number = request.json.get("passport_number")
+    passport_expiration = request.json.get("passport_expiration")
+    passport_country = request.json.get("passport_country")
+    date_of_birth = request.json.get("date_of_birth")
 
     try:
-        result = db.execute(query, {"email": email, "password": password, "first_name": first_name, "last_name": last_name})
+        result = db.execute(query, {
+            "email": email, "password": password, "first_name": first_name, "last_name": last_name,
+            "building": building, "street_name": street_name, "apt_number": apt_number, "city": city,
+            "state": state, "zipcode": zipcode, "passport_number": passport_number,
+            "passport_expiration": passport_expiration, "passport_country": passport_country,
+            "date_of_birth": date_of_birth
+        })
     except sqlalchemy.exc.IntegrityError as e:
         return jsonify({"success": False, "error": "Email already exists, please just login"})
+    
     return jsonify({"success": True})
 
 @app.route("/customer/logout", methods=["POST"])

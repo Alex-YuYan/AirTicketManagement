@@ -35,7 +35,7 @@ const CustomerDashboard = () => {
               </div>
             </div>
             <div className="bg-cover bg-center h-96 mb-6 rounded-lg shadow-xl" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/17043/d-abvm-lufthansa-boeing-747-430_PlanespottersNet_1208292_c45f636647_o.jpg)` }}></div>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <button className="bg-amber-100 hover:bg-amber-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/customerFlights")}>
                 <FaPlane className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">My Flights</span>
@@ -43,14 +43,6 @@ const CustomerDashboard = () => {
               <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/customerSearch")}>
                 <FaSearch className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Booking</span>
-              </button>
-              <button className="bg-blue-100 hover:bg-blue-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaUser className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Profile</span>
-              </button>
-              <button className="bg-purple-100 hover:bg-purple-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaStar className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Rate Flights</span>
               </button>
               <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
