@@ -27,13 +27,26 @@ app.config['CORS_HEADERS'] = 'Content-Type'
     Helper Functions
 '''
 def get_ticket_price(flight_number, dept_date_time, airline_name):
-    # if flight is 80% full, price is 1.25x base price
+    totalNum, currentNum = 0, 0
     query = "SELECT COUNT(*) FROM Ticket WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
-    currentNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    try:
+        currentNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    except Exception as e:
+        return -1
+    
     query = "SELECT num_seat FROM Airplane WHERE airplane_id = (SELECT airplane_id FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name)"
-    totalNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    try:
+        totalNum = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
+    except Exception as e:
+        return -1
+    
     if len(currentNum) == 0 or len(totalNum) == 0:
-        return 0
+        return -1
+    
+    if float(currentNum[0]['COUNT(*)']) - float(totalNum[0]['num_seat']) >= 0:
+        return -2
+
+    # if flight is 80% full, price is 1.25x base price
     if float(currentNum[0]['COUNT(*)']) >= float(totalNum[0]['num_seat']) * 0.8:
         query = "SELECT base_price * 1.25 AS price FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
     else :
@@ -157,13 +170,18 @@ def search_oneway():
                         fetch=True)
         if len(result) == 0:
             return jsonify({"success": False, "error": "No flight found"})
+        valid_flights = []
         for flight in result:
-            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
-        print(result)
+            validCheck = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+            if validCheck > 0:
+                flight['price'] = validCheck
+                valid_flights.append(flight)
+            else:
+                continue
     except Exception as e:
         print(e)
         return jsonify({"success": False, "error": "database error"})
-    return jsonify({"success": True, "flights": result})
+    return jsonify({"success": True, "flights": valid_flights})
 
 @app.route("/search/round-trip", methods=["GET"])
 def search_roundtrip():
