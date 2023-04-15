@@ -157,13 +157,50 @@ def search_oneway():
                         fetch=True)
         if len(result) == 0:
             return jsonify({"success": False, "error": "No flight found"})
-        price = get_ticket_price(result[0]['flight_number'], result[0]['dept_date_time'], result[0]['airline_name'])
-        result[0]['price'] = float(price)
+        for flight in result:
+            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
         print(result)
     except Exception as e:
         print(e)
         return jsonify({"success": False, "error": "database error"})
     return jsonify({"success": True, "flights": result})
+
+@app.route("/search/round-trip", methods=["GET"])
+def search_roundtrip():
+    dept_query = "SELECT * FROM Flight WHERE dept_airport = :dept_airport AND arrival_airport = :arrival_airport AND (dept_date_time BETWEEN :dept_date AND :dept_date_next_day)"
+    return_query = "SELECT * FROM Flight WHERE dept_airport = :arrival_airport AND arrival_airport = :dept_airport AND (dept_date_time BETWEEN :return_date AND :return_date_next_day)"
+
+    dept_date = request.args.get("dept_date")
+    return_date = request.args.get("return_date")
+    dept_airport = request.args.get("dept_airport")
+    arrival_airport = request.args.get("arrival_airport")
+    # Convert date in the format of YYYY-MM-DD to mysql datetime format
+    dept_date_next_day = dept_date + " 23:59:59"
+    dept_date = dept_date + " 00:00:00"
+    return_date_next_day = return_date + " 23:59:59"
+    return_date = return_date + " 00:00:00"
+
+    try:
+        dept_result = db.execute(dept_query, {"dept_airport": dept_airport, 
+                                "arrival_airport": arrival_airport, 
+                                "dept_date": dept_date, 
+                                "dept_date_next_day": dept_date_next_day},
+                        fetch=True)
+        return_result = db.execute(return_query, {"dept_airport": dept_airport, 
+                                "arrival_airport": arrival_airport, 
+                                "return_date": return_date, 
+                                "return_date_next_day": return_date_next_day},
+                        fetch=True)
+        if len(dept_result) == 0 or len(return_result) == 0:
+            return jsonify({"success": False, "error": "No flight found for the roundtrip"})
+        for flight in dept_result:
+            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+        for flight in return_result:
+            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+        return jsonify({"success": True, "dept_flights": dept_result, "return_flights": return_result})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
 
 @app.route("/customer/flights", methods=["GET"])
 @customer_login_required

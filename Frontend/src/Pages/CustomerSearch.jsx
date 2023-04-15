@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
 import { BiArrowBack } from 'react-icons/bi';
@@ -7,52 +7,66 @@ import FlightCardwPurchase from '../Components/FlightCardwPurchase';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerSearch = () => {
+  const currentDate = new Date();
+  const minDate = currentDate.toISOString().split('T')[0];
+
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
-  const [departureDate, setDepartureDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
+  const [departureDate, setDepartureDate] = useState(currentDate.toISOString().split('T')[0]);
+  const [returnDate, setReturnDate] = useState(currentDate.toISOString().split('T')[0]);
   const [tripType, setTripType] = useState('one-way');
   const [airlineName, setAirlineName] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
   const [statusDate, setStatusDate] = useState('');
   const [flightsData, setFlightsData] = useState([]);
   const [searched, setSearched] = useState(false);
+  const [returnFlightsData, setReturnFlightsData] = useState([]);
 
   const navigate = useNavigate();
 
-  const currentDate = new Date();
-  const minDate = currentDate.toISOString().split('T')[0];
-
-  // const checkDates = useEffect(() => {
-  //   if (departureDate < minDate) {
-  //     setDepartureDate(minDate);
-  //   } else if (departureDate > returnDate) {
-  //     setReturnDate(departureDate);
-  //   } else if (returnDate < minDate) {
-  //     setReturnDate(minDate);
-  //   }
-  // }, [departureDate, returnDate]);
-
   const handleSearch = async () => {
-    // console.log(source, destination, departureDate, returnDate, tripType);
-    try {
-      const response = await axios.get('/search/one-way', {
-        params: {
-          dept_airport: source,
-          arrival_airport: destination,
-          dept_date: departureDate
+    if (tripType === 'one-way') {
+      try {
+        const response = await axios.get('/search/one-way', {
+          params: {
+            dept_airport: source,
+            arrival_airport: destination,
+            dept_date: departureDate
+          }
+        });
+        if (response.data.success === true) {
+          setFlightsData(response.data.flights);
+          setSearched(true);
+        } else {
+          alert(response.data.error);
+          setSearched(true);
+          setFlightsData([]);
         }
-      });
-      if (response.data.success === true) {
-        setFlightsData(response.data.flights);
-        setSearched(true);
-      } else {
-        alert(response.data.error);
-        setSearched(true);
-        setFlightsData([]);
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      try {
+        const response = await axios.get('/search/round-trip', {
+          params: {
+            dept_airport: source,
+            arrival_airport: destination,
+            dept_date: departureDate,
+            return_date: returnDate
+          }
+        });
+        if (response.data.success === true) {
+          setFlightsData(response.data.dept_flights);
+          setReturnFlightsData(response.data.return_flights);
+          setSearched(true);
+        } else {
+          alert(response.data.error);
+          setSearched(true);
+          setFlightsData([]);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -172,7 +186,7 @@ const CustomerSearch = () => {
                   </button>
                 </form>
                 {
-                  flightsData.length > 0 ?
+                  tripType === 'one-way' && flightsData.length > 0 ?
                     <div className="container mx-auto p-4">
                       <h1 className="text-3xl font-bold mb-6">Flights</h1>
                       <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4">
@@ -181,8 +195,40 @@ const CustomerSearch = () => {
                         ))}
                       </div>
                     </div>
-                    : searched && <h1 className="text-2xl font-bold mt-4 text-red-500">No Flights Found for Given Information</h1>
+                    : tripType === 'one-way' && searched && <h1 className="text-2xl font-bold mt-4 text-red-500">No One-way Flights Found for Given Information</h1>
                 }
+                {
+                  tripType === 'round-trip' && flightsData.length > 0 && returnFlightsData.length > 0 ? (
+                    <div className="container mx-auto p-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                          <h1 className="text-3xl font-bold mb-6">Departing Flights</h1>
+                          <div className="grid grid-cols-1 gap-4">
+                            {flightsData.map((flight, index) => (
+                              <FlightCardwPurchase key={index} flight={flight} />
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h1 className="text-3xl font-bold mb-6 mt-8 lg:mt-0">Returning Flights</h1>
+                          <div className="grid grid-cols-1 gap-4">
+                            {returnFlightsData.map((flight, index) => (
+                              <FlightCardwPurchase key={index} flight={flight} />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    tripType === 'round-trip' &&
+                    searched && (
+                      <h1 className="text-2xl font-bold mt-4 text-red-500">
+                        No Round-Trip Flights Found for Given Information
+                      </h1>
+                    )
+                  )
+                }
+
               </Tab.Panel>
               <Tab.Panel>
                 <div className="mt-8">
