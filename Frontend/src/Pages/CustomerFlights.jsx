@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from 'react'
 import axios from '../axios';
 import { BiArrowBack } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import CommentButton from '../Components/CommentButton';
 
 const CustomerFlights = () => {
   const [flights, setFlights] = useState([])
@@ -66,9 +67,7 @@ const CustomerFlights = () => {
                     Cancel
                   </button>
                 :
-                  <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-md">
-                    Give a Review & Rating
-                  </button>
+                  <CommentButton />
               }
             </div>
           </div>
