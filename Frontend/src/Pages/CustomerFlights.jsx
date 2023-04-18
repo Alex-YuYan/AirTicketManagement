@@ -26,6 +26,25 @@ const CustomerFlights = () => {
     getFlights()
   }, [])
 
+  const handleCancel = async (flight) => {
+    try {
+      const params = {
+        id: flight.id
+      }
+      const res = await axios.post('/customer/cancel', params)
+      if (res.data && res.data.success === true) {
+        alert("Successfully cancelled flight")
+        navigate(0)
+      } else {
+        alert(res.data.message)
+      }
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
+
+
   return (<div className="min-h-screen bg-gradient-to-tr from-amber-400 to-cyan-500 py-6 flex flex-col justify-center sm:py-12">
     <div className="relative w-2/3 mx-auto">
       <div className="relative px-4 my-auto bg-gray-100 shadow-lg sm:rounded-3xl sm:p-20">
@@ -66,7 +85,7 @@ const CustomerFlights = () => {
             <div className="flex justify-end">
               {
                 new Date(flight.dept_date_time) > currentDate ?
-                  <button className="bg-red-500 text-white font-semibold py-2 px-4 rounded-md">
+                  <button className="bg-red-500 text-white font-semibold py-2 px-4 rounded-md" onClick={()=> handleCancel(flight)}>
                     Cancel
                   </button>
                 :

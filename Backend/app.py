@@ -323,5 +323,21 @@ def purchase_ticket():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/customer/cancel", methods=["POST"])
+@customer_login_required
+def cancel_ticket():
+    query = '''
+        DELETE FROM Ticket
+        WHERE id = :id
+    '''
+
+    id = request.json.get("id")
+
+    try:
+        db.execute(query, {"id": id})
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
 if __name__ == "__main__":
     app.run(debug=True)
