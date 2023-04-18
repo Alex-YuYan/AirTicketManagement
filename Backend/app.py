@@ -151,7 +151,7 @@ def logout():
     return jsonify({"success": True})
 
 '''
-    Customer Action Related
+    Non-Auth Needed Action Related
 '''
 @app.route("/search/one-way", methods=["GET"])
 def search_oneway():
@@ -222,6 +222,51 @@ def search_roundtrip():
         print(e)
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/search/status", methods=["GET"])
+def search_status():
+    airline_name = request.args.get("airline_name")
+    flight_number = request.args.get("flight_number")
+    dept_date_time = request.args.get("dept_date_time")
+    arrival_date_time = request.args.get("arrival_date_time")
+    if dept_date_time is None:
+        arrival_date_next_day = arrival_date_time + " 23:59:59"
+        arrival_date_time = arrival_date_time + " 00:00:00"
+        query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND arrival_date_time BETWEEN :arrival_date_time AND :arrival_date_next_day"
+
+        try:
+            result = db.execute(query, {"airline_name": airline_name,
+                                    "flight_number": flight_number,
+                                    "arrival_date_time": arrival_date_time,
+                                    "arrival_date_next_day": arrival_date_next_day},
+                            fetch=True)
+            if len(result) == 0:
+                return jsonify({"success": False, "error": "No flight found"})
+            return jsonify({"success": True, "flights": result})
+        except Exception as e:
+            print(e)
+            return jsonify({"success": False, "error": "database error"})
+    else:
+        dept_date_next_day = dept_date_time + " 23:59:59"
+        dept_date_time = dept_date_time + " 00:00:00"
+        query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time BETWEEN :dept_date_time AND :dept_date_next_day"
+        
+        try:
+            result = db.execute(query, {"airline_name": airline_name,
+                                    "flight_number": flight_number,
+                                    "dept_date_time": dept_date_time,
+                                    "dept_date_next_day": dept_date_next_day},
+                            fetch=True)
+            if len(result) == 0:
+                return jsonify({"success": False, "error": "No flight found"})
+            return jsonify({"success": True, "flights": result})
+        except Exception as e:
+            print(e)
+            return jsonify({"success": False, "error": "database error"})
+        
+
+'''
+    Customer Auth Needed Action Related
+'''
 @app.route("/customer/flights", methods=["GET"])
 @customer_login_required
 def get_customer_flights():

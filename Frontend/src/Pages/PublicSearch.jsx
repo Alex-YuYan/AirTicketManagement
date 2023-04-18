@@ -5,6 +5,7 @@ import { BiArrowBack } from 'react-icons/bi';
 import axios from '../axios';
 import FlightCard from '../Components/FlightCard';
 import { useNavigate } from 'react-router-dom';
+import FlightStatusCard from '../Components/FlightStatusCard';
 
 const PublicSearch = () => {
   const [source, setSource] = useState('');
@@ -17,6 +18,7 @@ const PublicSearch = () => {
   const [statusDate, setStatusDate] = useState('');
   const [flightsData, setFlightsData] = useState([]);
   const [searched, setSearched] = useState(false);
+  const [statusData, setStatusData] = useState([]);
 
   const navigate = useNavigate();
 
@@ -55,8 +57,26 @@ const PublicSearch = () => {
     }
   };
 
-  const handleFlightStatus = () => {
+  const handleFlightStatus = async () => {
     console.log(airlineName, flightNumber, statusDate);
+
+    try {
+      const response = await axios.get('/search/status', {
+        params: {
+          airline_name: airlineName,
+          flight_number: flightNumber,
+          dept_date_time: statusDate,
+        },
+      });
+      if (response.data.success === true) {
+        setStatusData(response.data.flights);
+      } else {
+        alert(response.data.error);
+        setStatusData([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -222,6 +242,22 @@ const PublicSearch = () => {
                     </button>
                   </form>
                 </div>
+                                {statusData.length > 0 ? (
+                  <div className="container mx-auto p-4">
+                    <h1 className="text-3xl font-bold mb-6">Flight Status</h1>
+                    <div className="grid grid-cols-1 gap-4">
+                      {statusData.map((flightStatus, index) => (
+                        <FlightStatusCard key={index} flight={flightStatus} />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  searched && (
+                    <h1 className="text-2xl font-bold mt-4 text-red-500">
+                      No Flight Status Found for Given Information
+                    </h1>
+                  )
+                )}
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
