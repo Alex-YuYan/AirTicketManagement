@@ -44,6 +44,9 @@ const CustomerFlights = () => {
               <div className="text-xl font-semibold mb-2">
                 {flight.airline_name} - {flight.flight_number}
               </div>
+              <div className="text-sm font-semibold mb-2">
+                purchased for: {flight.first_name} {flight.last_name}
+              </div>
             </div>
             <div className="text-gray-600 mb-4">
               Ticket ID: {flight.id}
@@ -62,7 +65,7 @@ const CustomerFlights = () => {
             </div>
             <div className="flex justify-end">
               {
-                Date(flight.dept_date_time) > currentDate ?
+                new Date(flight.dept_date_time) > currentDate ?
                   <button className="bg-red-500 text-white font-semibold py-2 px-4 rounded-md">
                     Cancel
                   </button>

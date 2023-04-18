@@ -226,7 +226,7 @@ def search_roundtrip():
 @customer_login_required
 def get_customer_flights():
     query = '''
-        SELECT Flight.*, Ticket.id, Ticket.price
+        SELECT Flight.*, Ticket.id, Ticket.price, Ticket.first_name, Ticket.last_name
         FROM Flight
         INNER JOIN Ticket ON Ticket.flight_number = Flight.flight_number
             AND Ticket.dept_date_time = Flight.dept_date_time
