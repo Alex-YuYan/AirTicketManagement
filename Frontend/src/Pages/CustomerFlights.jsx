@@ -67,7 +67,7 @@ const CustomerFlights = () => {
                     Cancel
                   </button>
                 :
-                  <CommentButton />
+                  <CommentButton flight={flight}/>
               }
             </div>
           </div>

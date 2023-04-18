@@ -241,6 +241,47 @@ def get_customer_flights():
         return jsonify({"success": False, "error": "database error"})
     return jsonify({"success": True, "flights": result})
 
+@app.route("/customer/rate", methods=["POST"])
+@customer_login_required
+def rate_flight():
+    # Check if the customer has already rated the flight
+    check = '''
+        SELECT * FROM Rate
+        WHERE email = :email AND airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
+    '''
+
+    email = session['customer_email']
+    airline_name = request.json.get("airline_name")
+    flight_number = request.json.get("flight_number")
+    dept_date_time = datetime.strptime(request.json.get("dept_date_time"), "%a, %d %b %Y %H:%M:%S %Z").strftime("%Y-%m-%d %H:%M:%S")
+    rating = request.json.get("rating")
+    comment = request.json.get("comment")
+
+    try:
+        result = db.execute(check, {"email": email, "airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, 
+                            fetch=True)
+        if len(result) > 0:
+            query = '''
+                UPDATE Rate
+                SET rating = :rating, comment = :comment
+                WHERE email = :email AND airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
+            '''
+        else:
+            query = '''
+                INSERT INTO Rate (email, airline_name, flight_number, dept_date_time, rating, comment)
+                VALUES (:email, :airline_name, :flight_number, :dept_date_time, :rating, :comment)
+            '''
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
+
+    try:
+        db.execute(query, {"email": email, "airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time, "rating": rating, "comment": comment})
+        return jsonify({"success": True})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
+
 @app.route("/customer/purchase", methods=["POST"])
 @customer_login_required
 def purchase_ticket():
