@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Menu, Tab } from '@headlessui/react';
 import { IoSearch } from 'react-icons/io5';
 import { BiArrowBack } from 'react-icons/bi';
 import axios from '../axios';
 import FlightCardwPurchase from '../Components/FlightCardwPurchase';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../Auth/AuthProvider';
 
 const CustomerSearch = () => {
   const currentDate = new Date();
   const minDate = currentDate.toISOString().split('T')[0];
+  const { userFirstName, userLastName, userDOB, userPassport } = useContext(AuthContext);
+
+  const user = {
+    userFirstName: userFirstName,
+    userLastName: userLastName,
+    userDOB: new Date(userDOB).toISOString().split('T')[0],
+    userPassport: userPassport
+  }
 
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
@@ -191,7 +200,7 @@ const CustomerSearch = () => {
                       <h1 className="text-3xl font-bold mb-6">Flights</h1>
                       <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4">
                         {flightsData.map((flight, index) => (
-                          <FlightCardwPurchase key={index} flight={flight} />
+                          <FlightCardwPurchase key={index} flight={flight} user={user}/>
                         ))}
                       </div>
                     </div>
@@ -205,7 +214,7 @@ const CustomerSearch = () => {
                           <h1 className="text-3xl font-bold mb-6">Departing Flights</h1>
                           <div className="grid grid-cols-1 gap-4">
                             {flightsData.map((flight, index) => (
-                              <FlightCardwPurchase key={index} flight={flight} />
+                              <FlightCardwPurchase key={index} flight={flight} user={user}/>
                             ))}
                           </div>
                         </div>
@@ -213,7 +222,7 @@ const CustomerSearch = () => {
                           <h1 className="text-3xl font-bold mb-6 mt-8 lg:mt-0">Returning Flights</h1>
                           <div className="grid grid-cols-1 gap-4">
                             {returnFlightsData.map((flight, index) => (
-                              <FlightCardwPurchase key={index} flight={flight} />
+                              <FlightCardwPurchase key={index} flight={flight} user={user}/>
                             ))}
                           </div>
                         </div>

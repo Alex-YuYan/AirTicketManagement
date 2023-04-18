@@ -10,6 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState('')
   const [userFirstName, setUserFirstName] = useState('')
   const [userLastName, setUserLastName] = useState('')
+  const [userDOB, setUserDOB] = useState('')
+  const [userPassport, setUserPassport] = useState('')
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -35,6 +37,8 @@ export const AuthProvider = ({ children }) => {
             setUserRole(res.data.role)
             if (res.data.role === 'customer') {
               setUserId(res.data.email)
+              setUserDOB(res.data.date_of_birth)
+              setUserPassport(res.data.passport_number)
             } else {
               setUserId(res.data.username)
             }
@@ -53,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ loggedIn, setLoggedIn, loading, userRole, userFirstName, userLastName, userId }}>
+    <AuthContext.Provider value={{ loggedIn, setLoggedIn, loading, userRole, userFirstName, userLastName, userId, userDOB, userPassport }}>
       {children}
     </AuthContext.Provider>
   )

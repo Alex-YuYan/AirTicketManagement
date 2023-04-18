@@ -2,7 +2,7 @@ import React from 'react';
 import { FaPlaneDeparture, FaPlaneArrival } from 'react-icons/fa';
 import PurchaseButton from './PurchaseButton';
 
-const FlightCardwPurchase = ({ flight }) => {
+const FlightCardwPurchase = ({ flight, user }) => {
   return (
     <div className="border border-gray-300 p-4 rounded-md shadow-md space-y-2">
       <h2 className="text-xl font-semibold">{flight.airline_name} {flight.flight_number}</h2>
@@ -29,7 +29,7 @@ const FlightCardwPurchase = ({ flight }) => {
         <p className="text-lg text-orange-600 font-semibold">${flight.price}</p>
       </div>
       <div className="flex justify-end">
-        <PurchaseButton flight={flight}/>
+        <PurchaseButton flight={flight} user={user}/>
       </div>
     </div>
   );

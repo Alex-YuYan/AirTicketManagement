@@ -78,7 +78,7 @@ def staff_login_required(f):
 @app.route("/verifyLogin", methods=["GET"])
 def verify_login():
     if 'customer_email' in session:
-        return jsonify({"success": True, "email": session['customer_email'], "role": "customer", "first_name": session['first_name'], "last_name": session['last_name']})
+        return jsonify({"success": True, "email": session['customer_email'], "role": "customer", "first_name": session['first_name'], "last_name": session['last_name'], "date_of_birth": session['date_of_birth'], "passport_number": session['passport_number']})
     elif 'staff_username' in session:
         return jsonify({"success": True, "username": session['staff_username'], "role": "staff"})
     return jsonify({"success": False})
@@ -98,6 +98,8 @@ def login():
         session['customer_email'] = result[0]['email']
         session['first_name'] = result[0]['first_name']
         session['last_name'] = result[0]['last_name']
+        session['date_of_birth'] = result[0]['date_of_birth']
+        session['passport_number'] = result[0]['passport_number']
         return jsonify({"success": True})
     return jsonify({"success": False, "error": "Invalid email or password"})
 
@@ -244,16 +246,15 @@ def get_customer_flights():
 def purchase_ticket():
     query = '''
         INSERT INTO Ticket (
-            email, id, purchase_date_time, airline_name, flight_number, dept_date_time,
-            card_type, card_number, name_card, card_expiration, price
+            email, purchase_date_time, airline_name, flight_number, dept_date_time,
+            card_type, card_number, name_card, card_expiration, price, first_name, last_name, date_of_birth, passport_number
         ) VALUES (
-            :email, :id, :purchase_date_time, :airline_name, :flight_number, :dept_date_time,
-            :card_type, :card_number, :card_name, :card_expiration, :price
+            :email, :purchase_date_time, :airline_name, :flight_number, :dept_date_time,
+            :card_type, :card_number, :card_name, :card_expiration, :price, :first_name, :last_name, :date_of_birth, :passport_number
         )
     '''
 
     email = session['customer_email']
-    ticket_id = hashlib.md5(str(datetime.now()).encode('utf-8')).hexdigest()
     purchase_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     airline_name = request.json.get("airline_name")
     flight_number = request.json.get("flight_number")
@@ -262,18 +263,23 @@ def purchase_ticket():
     card_number = request.json.get("card_number")
     card_name = request.json.get("card_name")
     card_expiration = request.json.get("card_expiration")
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    date_of_birth = request.json.get("date_of_birth")
+    passport_number = request.json.get("passport_number")
     price = get_ticket_price(flight_number, dept_date_time, airline_name)
     
     try:
         db.execute(query, {
-            "email": email, "id": ticket_id, "purchase_date_time": purchase_time,
+            "email": email, "purchase_date_time": purchase_time,
             "airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time,
             "card_type": card_type, "card_number": card_number, "card_name": card_name,
-            "card_expiration": card_expiration, "price": price
+            "card_expiration": card_expiration, "price": price, "first_name": first_name, "last_name": last_name, "date_of_birth": date_of_birth, "passport_number": passport_number
         })
         return jsonify({"success": True})
     except sqlalchemy.exc.IntegrityError as e:
-        print(e)
+        return jsonify({"success": False, "error": "duplicate ticket"})
+    except Exception as e:
         return jsonify({"success": False, "error": "database error"})
 
 if __name__ == "__main__":

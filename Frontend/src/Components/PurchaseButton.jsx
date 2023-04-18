@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { Dialog, Transition } from '@headlessui/react';
 import { RiErrorWarningLine } from 'react-icons/ri';
+
 import axios from '../axios';
 
-const PurchaseButton = ({ flight }) => {
+const PurchaseButton = ({ flight, user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -26,6 +27,10 @@ const PurchaseButton = ({ flight }) => {
       card_name: data.card_name,
       card_number: data.card_number,
       card_expiration: data.card_expiration,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      date_of_birth: data.date_of_birth,
+      passport_number: data.passport_number,
     };
 
     try {
@@ -46,6 +51,32 @@ const PurchaseButton = ({ flight }) => {
   };
 
   const formFields = [
+    {
+      name: 'first_name',
+      label: 'First Name',
+      type: 'text',
+      validation: { required: true },
+    },
+    {
+      name: 'last_name',
+      label: 'Last Name',
+      type: 'text',
+      validation: { required: true },
+    },
+    {
+      name: 'date_of_birth',
+      label: 'Date of Birth',
+      type: 'date',
+      validation: { required: true },
+      max: new Date().toISOString().slice(0, 10),
+      defaultValue: user.userDOB,
+    },
+    {
+      name: 'passport_number',
+      label: 'Passport Number',
+      type: 'text',
+      validation: { required: true },
+    },
     {
       name: 'card_type',
       label: 'Card Type',
@@ -152,8 +183,10 @@ const PurchaseButton = ({ flight }) => {
                           {...register(field.name, field.validation)}
                           type={field.type}
                           id={field.name}
+                          defaultValue={field.name === 'first_name' ? user.userFirstName : field.name === 'last_name' ? user.userLastName : field.name === 'passport_number' ? user.userPassport : field.defaultValue}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           min={field.min}
+                          max={field.max}
                         />
                       )}
                       {errors[field.name] && (
