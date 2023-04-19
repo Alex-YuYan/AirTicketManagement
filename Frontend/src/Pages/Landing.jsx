@@ -6,6 +6,7 @@ import md5 from 'blueimp-md5';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../Auth/AuthProvider';
+import StaffRegisterButton from '../Components/StaffRegisterButton';
 
 const Landing = () => {
   const [loginType, setLoginType] = useState('customer');
@@ -140,7 +141,7 @@ const Landing = () => {
                 loginType === 'customer' ?
                   <CustomerRegisterButton />
                   :
-                  <div></div>
+                  <StaffRegisterButton />
               }
             </div>
             <button

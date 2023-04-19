@@ -182,13 +182,56 @@ def customer_register():
             "passport_expiration": passport_expiration, "passport_country": passport_country,
             "date_of_birth": date_of_birth
         })
-        
+
         for phone_number in phone_numbers:
             query = "INSERT INTO Customer_Phone (email, phone_number) VALUES (:email, :phone_number)"
             db.execute(query, {"email": email, "phone_number": phone_number})
     except sqlalchemy.exc.IntegrityError as e:
         print(e)
         return jsonify({"success": False, "error": "Email already exists, please just login"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    
+    return jsonify({"success": True})
+
+@app.route("/staff/register", methods=["POST"])
+def staff_register():
+    username = request.json.get("username")
+    password = request.json.get("password")
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    airline_name = request.json.get("airline_name")
+    date_of_birth = request.json.get("date_of_birth")
+    phone_numbers = request.json.get("phone_numbers")
+    emails = request.json.get("emails")
+
+    query = """INSERT INTO Staff (
+        username, password, first_name, last_name, airline_name, date_of_birth
+    ) VALUES (
+        :username, :password, :first_name, :last_name, :airline_name, :date_of_birth
+    )"""
+
+    if not username or not password or not first_name or not last_name or not airline_name or not date_of_birth or not emails:
+        return jsonify({"success": False, "error": "Missing required information"})
+    
+    try:
+        db.execute(query, {
+            "username": username, "password": password, "first_name": first_name, "last_name": last_name,
+            "airline_name": airline_name, "date_of_birth": date_of_birth
+        })
+
+        if phone_numbers:
+            for phone_number in phone_numbers:
+                query = "INSERT INTO Staff_Phone (username, phone) VALUES (:username, :phone_number)"
+                db.execute(query, {"username": username, "phone_number": phone_number})
+        
+        for email in emails:
+            query = "INSERT INTO Staff_Email (username, email) VALUES (:username, :email)"
+            db.execute(query, {"username": username, "email": email})
+
+    except sqlalchemy.exc.IntegrityError as e:
+        print(e)
+        return jsonify({"success": False, "error": "Username already exists, or airline name does not exist"})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     
