@@ -78,13 +78,13 @@ def get_month_spending(start_date, end_date):
         year = int(start_year) + int((int(start_month) + i - 1) / 12)
         month = (int(start_month) + i - 1) % 12 + 1
         if i == 0:
-            start_date = str(year) + "-" + str(month) + "-" + start_day
+            start_date = str(year) + "-" + str(month) + "-" + start_day + " 00:00:00"
         else:
-            start_date = str(year) + "-" + str(month) + "-01"
+            start_date = str(year) + "-" + str(month) + "-01" + " 00:00:00"
         # if not the last month, end date is the last day of the month, which varies by month
-        end_date = str(year) + "-" + str(month) + "-" + str(monthrange(year, month)[1])
+        end_date = str(year) + "-" + str(month) + "-" + str(monthrange(year, month)[1]) + " 23:59:59"
         if i == num_months - 1:
-            end_date = end_year + "-" + end_month + "-" + end_day
+            end_date = end_year + "-" + end_month + "-" + end_day + " 23:59:59"
         
         # get the spending for the current month
         query = "SELECT SUM(price) AS spending FROM Ticket WHERE email = :email AND purchase_date_time >= :start_date AND purchase_date_time <= :end_date"
