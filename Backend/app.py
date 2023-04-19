@@ -119,7 +119,7 @@ def verify_login():
     if 'customer_email' in session:
         return jsonify({"success": True, "email": session['customer_email'], "role": "customer", "first_name": session['first_name'], "last_name": session['last_name'], "date_of_birth": session['date_of_birth'], "passport_number": session['passport_number']})
     elif 'staff_username' in session:
-        return jsonify({"success": True, "username": session['staff_username'], "role": "staff"})
+        return jsonify({"success": True, "username": session['staff_username'], "role": "staff", "first_name": session['first_name'], "last_name": session['last_name'], "airline_name": session['airline_name']})
     return jsonify({"success": False})
 
 @app.route("/customer/login", methods=["POST"])
@@ -141,6 +141,25 @@ def login():
         session['passport_number'] = result[0]['passport_number']
         return jsonify({"success": True})
     return jsonify({"success": False, "error": "Invalid email or password"})
+
+@app.route("/staff/login", methods=["POST"])
+def staff_login():
+    query = "SELECT * FROM Staff WHERE username = :username AND password = :password"
+
+    username = request.json.get("username")
+    password = request.json.get("password")
+
+    try:
+        result = db.execute(query, {"username": username, "password": password}, fetch=True)
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    if len(result) == 1:
+        session['staff_username'] = result[0]['username']
+        session['first_name'] = result[0]['first_name']
+        session['last_name'] = result[0]['last_name']
+        session['airline_name'] = result[0]['airline_name']
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Invalid username or password"})
 
 @app.route("/customer/register", methods=["POST"])
 def customer_register():
@@ -235,6 +254,15 @@ def staff_register():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     
+    return jsonify({"success": True})
+
+@app.route("/staff/logout", methods=["POST"])
+@staff_login_required
+def staff_logout():
+    try:
+        session.clear()
+    except Exception as e:
+        return jsonify({"success": False})
     return jsonify({"success": True})
 
 @app.route("/customer/logout", methods=["POST"])

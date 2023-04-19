@@ -9,29 +9,33 @@ import axios from '../axios';
 const StaffDashboard = () => {
   let [isOpen, setIsOpen] = useState(false);
   const nav = useNavigate();
-  const { setLoggedIn, userFirstName, userLastName } = useContext(AuthContext);
+  const { setLoggedIn, userFirstName, userLastName, userAirline } = useContext(AuthContext);
 
   const handleLogout = async () => {
-    const res = await axios.post("/customer/logout");
-    if (res.data && res.data.success === true) {
-      setLoggedIn(false);
-      setIsOpen(false);
-      alert('You have been logged out.');
-      nav('/');
-    } else {
-      alert('Something went wrong.');
+    try{
+      const res = await axios.post("/staff/logout");
+      if (res.data && res.data.success === true) {
+        setLoggedIn(false);
+        setIsOpen(false);
+        alert('You have been logged out.');
+        nav('/');
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-amber-400 to-cyan-500 py-6 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen bg-gradient-to-tr from-purple-400 to-green-400 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative w-2/3 mx-auto">
         <div className="relative px-4 my-auto bg-white shadow-lg sm:rounded-3xl sm:p-20">
           <div className="mx-auto">
             <div className="flex justify-left -mb-16 ml-4">
               <div className="flex">
-                <FaUser className="text-blue-800 w-10 h-10" />
-                <h1 className="text-4xl font-medium marker:text-opacity-80 text-black ml-4">Welcome, {userFirstName} {userLastName}!</h1>
+                <FaUser className="text-red-800 w-10 h-10" />
+                <h1 className="text-4xl font-medium marker:text-opacity-80 text-black ml-4">Welcome, {userFirstName} {userLastName} from {userAirline}!</h1>
               </div>
             </div>
             <div className="bg-cover bg-center h-96 mb-6 rounded-lg shadow-xl" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/17043/d-abvm-lufthansa-boeing-747-430_PlanespottersNet_1208292_c45f636647_o.jpg)` }}></div>

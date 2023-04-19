@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [userLastName, setUserLastName] = useState('')
   const [userDOB, setUserDOB] = useState('')
   const [userPassport, setUserPassport] = useState('')
+  const [userAirline, setUserAirline] = useState('')
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -41,9 +42,18 @@ export const AuthProvider = ({ children }) => {
               setUserPassport(res.data.passport_number)
             } else {
               setUserId(res.data.username)
+              setUserAirline(res.data.airline_name)
             }
             setUserFirstName(res.data.first_name)
             setUserLastName(res.data.last_name)
+          } else {
+            setUserRole('')
+            setUserId('')
+            setUserFirstName('')
+            setUserLastName('')
+            setUserDOB('')
+            setUserPassport('')
+            setUserAirline('')
           }
           setLoading(false)
         } catch (error) {
@@ -57,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ loggedIn, setLoggedIn, loading, userRole, userFirstName, userLastName, userId, userDOB, userPassport }}>
+    <AuthContext.Provider value={{ loggedIn, setLoggedIn, loading, userRole, userFirstName, userLastName, userId, userDOB, userPassport, userAirline }}>
       {children}
     </AuthContext.Provider>
   )

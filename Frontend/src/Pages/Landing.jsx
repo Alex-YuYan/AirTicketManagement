@@ -22,7 +22,8 @@ const Landing = () => {
     if (loggedIn === true) {
       if (userRole === 'customer') {
         navigate('/customerDashboard');
-      } else {
+      } else if (userRole === 'staff') {
+        navigate('/staffDashboard');
       }
     }
   }, [loggedIn, userRole]);
@@ -41,6 +42,28 @@ const Landing = () => {
       if (response.data.success === true) {
         // alert('Sucessfully logged in!');
         window.location.href = '/customerDashboard';
+      } else {
+        alert(response.data.error);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleStaffLogin = async () => {
+    const username = info.username;
+    const password = md5(info.password);
+
+    const data = {
+      "username": username,
+      "password": password
+    };
+
+    try {
+      const response = await axios.post('/staff/login', data)
+      if (response.data.success === true) {
+        // alert('Sucessfully logged in!');
+        window.location.href = '/staffDashboard';
       } else {
         alert(response.data.error);
       }
@@ -130,6 +153,7 @@ const Landing = () => {
                       <button
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                         type="button"
+                        onClick={() => { handleStaffLogin() }}
                       >
                         Staff Sign In
                       </button>
