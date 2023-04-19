@@ -23,6 +23,8 @@ db.init_app(app)
 CORS(app, supports_credentials=True)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+states = ['new york', 'new jersey', 'california', 'texas', 'florida', 'illinois', 'pennsylvania', 'ohio', 'georgia', 'michigan', 'north carolina', 'virginia', 'washington', 'arizona', 'massachusetts', 'indiana', 'tennessee', 'missouri', 'maryland', 'wisconsin', 'minnesota', 'colorado', 'alabama', 'south carolina', 'louisiana', 'kentucky', 'oregon', 'oklahoma', 'connecticut', 'utah', 'iowa', 'mississippi', 'arkansas', 'kansas', 'nevada', 'new mexico', 'nebraska', 'west virginia', 'idaho', 'hawaii', 'new hampshire', 'maine', 'rhode island', 'montana', 'delaware', 'south dakota', 'north dakota', 'alaska', 'wyoming', 'district of columbia', 'puerto rico', 'virgin islands', 'guam', 'american samoa', 'northern mariana islands']
+
 
 '''
     Helper Functions
@@ -83,8 +85,6 @@ def get_month_spending(start_date, end_date):
         end_date = str(year) + "-" + str(month) + "-" + str(monthrange(year, month)[1])
         if i == num_months - 1:
             end_date = end_year + "-" + end_month + "-" + end_day
-
-        print(start_date, end_date)
         
         # get the spending for the current month
         query = "SELECT SUM(price) AS spending FROM Ticket WHERE email = :email AND purchase_date_time >= :start_date AND purchase_date_time <= :end_date"
@@ -166,17 +166,31 @@ def customer_register():
     passport_expiration = request.json.get("passport_expiration")
     passport_country = request.json.get("passport_country")
     date_of_birth = request.json.get("date_of_birth")
+    phone_numbers = request.json.get("phone_numbers")
+
+    if not email or not password or not first_name or not last_name or not building or not street_name or not city or not state or not zipcode or not passport_number or not passport_expiration or not passport_country or not date_of_birth or not phone_numbers:
+        return jsonify({"success": False, "error": "Missing required information"})
+
+    if state.lower() not in states:
+        return jsonify({"success": False, "error": "Invalid state"})
 
     try:
-        result = db.execute(query, {
+        db.execute(query, {
             "email": email, "password": password, "first_name": first_name, "last_name": last_name,
             "building": building, "street_name": street_name, "apt_number": apt_number, "city": city,
             "state": state, "zipcode": zipcode, "passport_number": passport_number,
             "passport_expiration": passport_expiration, "passport_country": passport_country,
             "date_of_birth": date_of_birth
         })
+        
+        for phone_number in phone_numbers:
+            query = "INSERT INTO Customer_Phone (email, phone_number) VALUES (:email, :phone_number)"
+            db.execute(query, {"email": email, "phone_number": phone_number})
     except sqlalchemy.exc.IntegrityError as e:
+        print(e)
         return jsonify({"success": False, "error": "Email already exists, please just login"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
     
     return jsonify({"success": True})
 
@@ -429,10 +443,8 @@ def get_spending():
     print("here")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    print(start_date, end_date)
     try:
         result = get_month_spending(start_date, end_date)
-        print(result)
         result = [{"month": month[:-3], "spending": float(spending) if spending is not None else 0.0} for month, spending in result]
         return jsonify({"success": True, "spending": result})
     except Exception as e:

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Dialog, Transition } from '@headlessui/react';
-import { RiErrorWarningLine } from 'react-icons/ri';
+import { RiErrorWarningLine, RiDeleteBinLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
 import md5 from 'blueimp-md5';
 
 const CustomerRegisterButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [phoneNumbers, setPhoneNumbers] = useState([]);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -16,12 +19,33 @@ const CustomerRegisterButton = () => {
 
   const onSubmit = async (data) => {
     data.password = md5(data.password);
+    if (phoneNumbers.length === 0) {
+      alert('Please add at least one phone number.');
+      return;
+    }
+    // check phone number duplicates
+    const phoneNumbersSet = new Set(phoneNumbers);
+    if (phoneNumbersSet.size !== phoneNumbers.length) {
+      alert('Please do not add duplicate phone numbers.');
+      return;
+    }
+    if (new Date(data.passport_expiration) < new Date()) {
+      alert('Passport expiration date must be in the future.');
+      return;
+    }
+    if (new Date(data.date_of_birth) > new Date()) {
+      alert('Birthday must be in the past.');
+      return;
+    }
+    data.phone_numbers = phoneNumbers;
+    console.log(data);
     try {
       const response = await axios.post('/customer/register', data)
       if (response.data.success === true) {
         alert('Registration successful, please log in.');
         setIsOpen(false);
         reset();
+        navigate(0);
       } else {
         alert(response.data.error);
       }
@@ -30,21 +54,38 @@ const CustomerRegisterButton = () => {
     }
   };
 
+  const addPhoneNumber = () => {
+    const newPhoneNumber = document.getElementById('phone_number').value;
+    if (newPhoneNumber && !phoneNumbers.includes(newPhoneNumber)) {
+      setPhoneNumbers([...phoneNumbers, newPhoneNumber]);
+    }
+  };
+
+  const deletePhoneNumber = (index) => {
+    setPhoneNumbers(phoneNumbers.filter((_, i) => i !== index));
+  };
+
   const formFields = [
     { name: 'first_name', label: 'First Name', type: 'text', validation: { required: true } },
     { name: 'last_name', label: 'Last Name', type: 'text', validation: { required: true } },
     { name: 'email', label: 'Email', type: 'email', validation: { required: true, pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i } },
     { name: 'password', label: 'Password', type: 'password', validation: { required: true } },
-    { name: 'building', label: 'Building', type: 'text', validation: {} },
-    { name: 'street_name', label: 'Street Name', type: 'text', validation: {} },
-    { name: 'apt_number', label: 'Apt Number', type: 'text', validation: {} },
-    { name: 'city', label: 'City', type: 'text', validation: {} },
-    { name: 'state', label: 'State', type: 'text', validation: {} },
-    { name: 'zipcode', label: 'Zipcode', type: 'text', validation: { pattern: /^\d{5}$/ } },
-    { name: 'passport_number', label: 'Passport Number', type: 'text', validation: {} },
-    { name: 'passport_expiration', label: 'Passport Expiration', type: 'date', validation: {} },
-    { name: 'passport_country', label: 'Passport Country', type: 'text', validation: {} },
-    { name: 'date_of_birth', label: 'Date of Birth', type: 'date', validation: {} },
+    { name: 'building', label: 'Building', type: 'text', validation: { required: true } },
+    { name: 'street_name', label: 'Street Name', type: 'text', validation: { required: true } },
+    { name: 'apt_number', label: 'Apt Number', type: 'text', validation: { required: true } },
+    { name: 'city', label: 'City', type: 'text', validation: { required: true } },
+    { name: 'state', label: 'State', type: 'text', validation: { required: true } },
+    { name: 'zipcode', label: 'Zipcode', type: 'text', validation: { pattern: /^\d{5}$/, required: true } },
+    { name: 'passport_number', label: 'Passport Number', type: 'text', validation: { required: true } },
+    { name: 'passport_expiration', label: 'Passport Expiration', type: 'date', validation: { required: true } },
+    { name: 'passport_country', label: 'Passport Country', type: 'text', validation: { required: true } },
+    { name: 'date_of_birth', label: 'Date of Birth', type: 'date', validation: { required: true } },
+    {
+      name: 'phone_number',
+      label: 'Phone Number',
+      type: 'tel',
+      validation: { pattern: /^[0-9]{10}$/ },
+    },
   ];
 
 
@@ -127,6 +168,37 @@ const CustomerRegisterButton = () => {
                       )}
                     </div>
                   ))}
+                  <div className="mt-4">
+                  <label
+                    htmlFor="phone_numbers"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Added Phone Numbers
+                  </label>
+                  <ul>
+                    {phoneNumbers.map((number, index) => (
+                      <li key={index} className="flex items-center mt-2">
+                        <span className="mr-2">{number}</span>
+                        <button
+                          type="button"
+                          className="text-red-500 focus:outline-none"
+                          onClick={() => deletePhoneNumber(index)}
+                        >
+                          <RiDeleteBinLine size={20} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    className="w-full px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    onClick={addPhoneNumber}
+                  >
+                    Add Phone Number
+                  </button>
+                </div>
                   <div className="mt-6 col-span-full">
                     <button
                       type="submit"
