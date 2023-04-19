@@ -565,5 +565,38 @@ def get_flights():
         print(e)
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/staff/airports", methods=["POST"])
+@staff_login_required
+def add_airport():
+    code = request.json.get("code")
+    name = request.json.get("name")
+    city = request.json.get("city")
+    country = request.json.get("country")
+    types = request.json.get("type")
+
+    if not code or not name or not city or not country or not types:
+        return jsonify({"success": False, "error": "missing field"})
+
+    query = '''
+        INSERT INTO Airport (code, name, city, country)
+        VALUES (:code, :name, :city, :country)
+    '''
+
+    queryTypes = '''
+        INSERT INTO Airport_Type (code, type)
+        VALUES (:code, :type)
+    '''
+
+    try:
+        db.execute(query, {"code": code, "name": name, "city": city, "country": country})
+        for each in types:
+            db.execute(queryTypes, {"code": code, "type": each})
+        return jsonify({"success": True})
+    except sqlalchemy.exc.IntegrityError as e:
+        return jsonify({"success": False, "error": "duplicate airport"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
+
 if __name__ == "__main__":
     app.run(debug=True)

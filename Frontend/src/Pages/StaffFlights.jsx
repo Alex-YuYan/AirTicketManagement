@@ -30,9 +30,6 @@ const StaffFlights = () => {
           alert(res.data.error);
         } else {
           setFlights(res.data.flights);
-          if (res.data.flights.length === 0) {
-            alert('No matching flights found!');
-          }
         }
       } catch (error) {
         console.error(error);
@@ -65,14 +62,14 @@ const StaffFlights = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-amber-400 to-cyan-500 py-6 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen bg-gradient-to-tr from-purple-400 to-green-400 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative w-2/3 mx-auto">
         <div className="relative px-4 my-auto bg-gray-100 shadow-lg sm:rounded-3xl sm:p-20">
           <div className="flex justify-center">
             <div className="cursor-pointer" onClick={() => navigate('/staffDashboard')}>
               <BiArrowBack className="text-3xl text-gray-800" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">Staff Flights</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4 mx-auto">View Company's Flights</h1>
           </div>
           <div className='grid grid-cols-2 gap-1'>
             <input

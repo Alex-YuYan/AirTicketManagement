@@ -52,7 +52,7 @@ const StaffDashboard = () => {
                 <FaPlane className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Add Airplane</span>
               </button>
-              <button className="bg-purple-100 hover:bg-purple-200 p-6 rounded-lg flex items-center shadow-md">
+              <button className="bg-purple-100 hover:bg-purple-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffAirports")}>
                 <FaStar className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Add Airport</span>
               </button>

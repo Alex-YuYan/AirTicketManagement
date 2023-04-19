@@ -11,6 +11,7 @@ import CustomerSearch from './Pages/CustomerSearch';
 import CustomerSpending from './Pages/CustomerSpending';
 import StaffDashboard from './Pages/StaffDashboard';
 import StaffFlights from './Pages/StaffFlights';
+import StaffAirports from './Pages/StaffAirports';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path='/customerSpending' element={<CustomerSpending />} />
         <Route path='/staffDashboard' element={<StaffDashboard />} />
         <Route path='/staffFlights' element={<StaffFlights />} />
+        <Route path='/staffAirports' element={<StaffAirports />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
