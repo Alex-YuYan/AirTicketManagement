@@ -13,6 +13,7 @@ import StaffDashboard from './Pages/StaffDashboard';
 import StaffFlights from './Pages/StaffFlights';
 import StaffAirports from './Pages/StaffAirports';
 import StaffAirplane from './Pages/StaffAirplane';
+import StaffAddFlight from './Pages/StaffAddFlight';
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='/staffFlights' element={<StaffFlights />} />
         <Route path='/staffAirports' element={<StaffAirports />} />
         <Route path='/staffAirplane' element={<StaffAirplane />} />
+        <Route path='/staffAddFlight' element={<StaffAddFlight />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

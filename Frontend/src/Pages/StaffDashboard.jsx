@@ -44,7 +44,7 @@ const StaffDashboard = () => {
                 <FaSearch className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">View Flights</span>
               </button>
-              <button className="bg-amber-100 hover:bg-amber-200 p-6 rounded-lg flex items-center shadow-md">
+              <button className="bg-amber-100 hover:bg-amber-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffAddFlight")}>
                 <FaPlane className="text-gray-700 w-10 h-10"/>
                 <span className="text-xl font-bold ml-4">Add Flights</span>
               </button>
