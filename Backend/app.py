@@ -1,4 +1,5 @@
 from datetime import datetime, time
+from calendar import monthrange
 from functools import wraps
 import hashlib
 from flask import Flask, jsonify, request, session
@@ -53,6 +54,44 @@ def get_ticket_price(flight_number, dept_date_time, airline_name):
         query = "SELECT base_price AS price FROM Flight WHERE flight_number = :flight_number AND dept_date_time = :dept_date_time AND airline_name = :airline_name"
     price = db.execute(query, {"flight_number": flight_number, "dept_date_time": dept_date_time, "airline_name": airline_name}, fetch=True)
     return price[0]['price']
+
+def get_month_spending(start_date, end_date):
+    # for each month between start_date and end_date, get the total spending
+    # return a list of tuples (month, spending)
+    # start_date and end_date are in the format of "YYYY-MM-DD"
+
+    # parse start_date and end_date
+    start_year, start_month, start_day = start_date.split("-")
+    end_year, end_month, end_day = end_date.split("-")
+
+    # get the number of months between start_date and end_date
+    num_months = (int(end_year) - int(start_year)) * 12 + (int(end_month) - int(start_month)) + 1
+
+    email = session['customer_email']
+
+    # get the spending for each month
+    spending = []
+    for i in range(num_months):
+        # get the start and end date of the current month
+        year = int(start_year) + int((int(start_month) + i - 1) / 12)
+        month = (int(start_month) + i - 1) % 12 + 1
+        if i == 0:
+            start_date = str(year) + "-" + str(month) + "-" + start_day
+        else:
+            start_date = str(year) + "-" + str(month) + "-01"
+        # if not the last month, end date is the last day of the month, which varies by month
+        end_date = str(year) + "-" + str(month) + "-" + str(monthrange(year, month)[1])
+        if i == num_months - 1:
+            end_date = end_year + "-" + end_month + "-" + end_day
+
+        print(start_date, end_date)
+        
+        # get the spending for the current month
+        query = "SELECT SUM(price) AS spending FROM Ticket WHERE email = :email AND purchase_date_time >= :start_date AND purchase_date_time <= :end_date"
+        result = db.execute(query, {"start_date": start_date, "end_date": end_date, "email": email}, fetch=True)
+        spending.append((start_date, result[0]['spending']))
+    
+    return spending
 
 '''
     User Authentication Related
@@ -383,6 +422,23 @@ def cancel_ticket():
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
+
+@app.route("/customer/spending", methods=["GET"])
+@customer_login_required
+def get_spending():
+    print("here")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    print(start_date, end_date)
+    try:
+        result = get_month_spending(start_date, end_date)
+        print(result)
+        result = [{"month": month[:-3], "spending": float(spending) if spending is not None else 0.0} for month, spending in result]
+        return jsonify({"success": True, "spending": result})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

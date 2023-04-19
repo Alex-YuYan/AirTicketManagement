@@ -8,6 +8,7 @@ import NotFound from './Pages/NotFound';
 import CustomerFlights from './Pages/CustomerFlights';
 import PublicSearch from './Pages/PublicSearch';
 import CustomerSearch from './Pages/CustomerSearch';
+import CustomerSpending from './Pages/CustomerSpending';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
         <Route path="/customerFlights" element={<CustomerFlights />} />
         <Route path='/customerSearch' element={<CustomerSearch />} />
+        <Route path='/customerSpending' element={<CustomerSpending />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
