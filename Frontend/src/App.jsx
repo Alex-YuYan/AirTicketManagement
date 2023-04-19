@@ -12,6 +12,7 @@ import CustomerSpending from './Pages/CustomerSpending';
 import StaffDashboard from './Pages/StaffDashboard';
 import StaffFlights from './Pages/StaffFlights';
 import StaffAirports from './Pages/StaffAirports';
+import StaffAirplane from './Pages/StaffAirplane';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
         <Route path='/staffDashboard' element={<StaffDashboard />} />
         <Route path='/staffFlights' element={<StaffFlights />} />
         <Route path='/staffAirports' element={<StaffAirports />} />
+        <Route path='/staffAirplane' element={<StaffAirplane />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

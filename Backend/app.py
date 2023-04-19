@@ -597,6 +597,30 @@ def add_airport():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/staff/airplane", methods=["POST"])
+@staff_login_required
+def add_airplane():
+    airplane_id = request.json.get("airplane_id")
+    airline_name = session['airline_name']
+    num_seat = request.json.get("num_seat")
+    manufacturer = request.json.get("manufacturer")
+    manufacture_date = request.json.get("manufacture_date")
+
+    if not airplane_id or not num_seat or not manufacturer or not manufacture_date:
+        return jsonify({"success": False, "error": "missing field"})
+    
+    query = '''
+        INSERT INTO Airplane (airplane_id, airline_name, num_seat, manufacturer, manufacture_date)
+        VALUES (:airplane_id, :airline_name, :num_seat, :manufacturer, :manufacture_date)
+    '''
+
+    try:
+        db.execute(query, {"airplane_id": airplane_id, "airline_name": airline_name, "num_seat": num_seat, "manufacturer": manufacturer, "manufacture_date": manufacture_date})
+        return jsonify({"success": True})
+    except sqlalchemy.exc.IntegrityError as e:
+        return jsonify({"success": False, "error": "duplicate airplane"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
 
 if __name__ == "__main__":
     app.run(debug=True)
