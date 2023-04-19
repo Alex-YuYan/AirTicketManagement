@@ -93,6 +93,16 @@ def get_month_spending(start_date, end_date):
     
     return spending
 
+def get_airport_name(code):
+    query = "SELECT name FROM Airport WHERE code = :code"
+    result = db.execute(query, {"airport_code": code}, fetch=True)
+    return result[0]['name']
+
+def get_city_name(code):
+    query = "SELECT city FROM Airport WHERE code = :code"
+    result = db.execute(query, {"airport_code": code}, fetch=True)
+    return result[0]['city']
+
 '''
     User Authentication Related
 '''
@@ -386,7 +396,16 @@ def search_status():
         except Exception as e:
             print(e)
             return jsonify({"success": False, "error": "database error"})
-        
+
+@app.route("/list/airports", methods=["GET"])
+def list_airports():
+    query = "SELECT * FROM Airport"
+    try:
+        result = db.execute(query, fetch=True)
+        return jsonify({"success": True, "airports": result})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
 
 '''
     Customer Auth Needed Action Related
@@ -515,7 +534,7 @@ def get_spending():
     end_date = request.args.get("end_date")
     try:
         result = get_month_spending(start_date, end_date)
-        result = [{"month": month[:-3], "spending": float(spending) if spending is not None else 0.0} for month, spending in result]
+        result = [{"month": month[:-12], "spending": float(spending) if spending is not None else 0.0} for month, spending in result]
         return jsonify({"success": True, "spending": result})
     except Exception as e:
         print(e)
