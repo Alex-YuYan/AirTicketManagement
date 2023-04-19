@@ -511,7 +511,6 @@ def cancel_ticket():
 @app.route("/customer/spending", methods=["GET"])
 @customer_login_required
 def get_spending():
-    print("here")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
     try:
@@ -522,6 +521,49 @@ def get_spending():
         print(e)
         return jsonify({"success": False, "error": "database error"})
 
+'''
+    Staff Auth Needed Action Related
+'''
+@app.route("/staff/flights", methods=["GET"])
+@staff_login_required
+def get_flights():
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    airline_name = session['airline_name']
+    source = request.args.get("source")
+    destination = request.args.get("destination")
+
+    start_date = start_date + " 00:00:00"
+    end_date = end_date + " 23:59:59"
+
+    try:
+        if len(source) > 0 and len(destination) > 0:
+            query = '''
+                SELECT * FROM Flight
+                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date AND dept_airport = :source AND arrival_airport = :destination
+            '''
+        elif len(source) > 0:
+            query = '''
+                SELECT * FROM Flight
+                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date AND dept_airport = :source
+            '''
+        elif len(destination) > 0:
+            query = '''
+                SELECT * FROM Flight
+                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date AND dept_airport = :destination
+            '''
+        else:
+            query = '''
+                SELECT * FROM Flight
+                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date
+            '''
+        result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date, "source": source, "destination": destination}, fetch=True)
+        result = [dict(row) for row in result]
+        print(result)
+        return jsonify({"success": True, "flights": result})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
 
 if __name__ == "__main__":
     app.run(debug=True)

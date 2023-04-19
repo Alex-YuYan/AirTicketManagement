@@ -8,7 +8,7 @@ import axios from '../axios';
 
 const StaffDashboard = () => {
   let [isOpen, setIsOpen] = useState(false);
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const { setLoggedIn, userFirstName, userLastName, userAirline } = useContext(AuthContext);
 
   const handleLogout = async () => {
@@ -18,7 +18,7 @@ const StaffDashboard = () => {
         setLoggedIn(false);
         setIsOpen(false);
         alert('You have been logged out.');
-        nav('/');
+        navigate('/');
       } else {
         alert('Something went wrong. Please try again.');
       }
@@ -39,26 +39,34 @@ const StaffDashboard = () => {
               </div>
             </div>
             <div className="bg-cover bg-center h-96 mb-6 rounded-lg shadow-xl" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/17043/d-abvm-lufthansa-boeing-747-430_PlanespottersNet_1208292_c45f636647_o.jpg)` }}></div>
-            <div className="grid grid-cols-3 gap-6">
-              <button className="bg-amber-100 hover:bg-amber-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaPlane className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">My Flights</span>
-              </button>
+            <div className="grid grid-cols-4 gap-6">
               <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaSearch className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Search / Booking</span>
+                <span className="text-xl font-bold ml-4">Add Flights</span>
+              </button>
+              <button className="bg-amber-100 hover:bg-amber-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffFlights")}>
+                <FaPlane className="text-gray-700 w-10 h-10"/>
+                <span className="text-xl font-bold ml-4">View Flights</span>
               </button>
               <button className="bg-blue-100 hover:bg-blue-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaUser className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Profile</span>
+                <FaPlane className="text-gray-700 w-10 h-10" />
+                <span className="text-xl font-bold ml-4">Add Airplane</span>
               </button>
               <button className="bg-purple-100 hover:bg-purple-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaStar className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Rate Flights</span>
+                <span className="text-xl font-bold ml-4">Add Airport</span>
               </button>
               <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Spendings</span>
+                <span className="text-xl font-bold ml-4">View Ratings</span>
+              </button>
+              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
+                <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
+                <span className="text-xl font-bold ml-4">Frequent Customers</span>
+              </button>
+              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
+                <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
+                <span className="text-xl font-bold ml-4">View Reports</span>
               </button>
               <button className="bg-gray-100 hover:bg-gray-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => setIsOpen(true)}>
                 <FaSignOutAlt className="text-gray-700 w-10 h-10" />
