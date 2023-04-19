@@ -2,6 +2,14 @@ import React, { useState, useContext, useEffect } from 'react';
 import AuthContext from '../Auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
+import { BiArrowBack } from 'react-icons/bi';
+import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts/core';
+import { BarChart, LineChart } from 'echarts/charts';
+import { TooltipComponent, GridComponent, LegendComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+echarts.use([TooltipComponent, GridComponent, LegendComponent, BarChart, LineChart, CanvasRenderer]);
 
 const CustomerSpending = () => {
   const navigate = useNavigate();
@@ -14,7 +22,56 @@ const CustomerSpending = () => {
   const [displayStartDate, setDisplayStartDate] = useState(null);
   const [displayEndDate, setDisplayEndDate] = useState(null);
 
+  const getBarChartOptions = () => {
+    const xAxisData = spending.map(item => item.month);
+    const seriesData = spending.map(item => item.spending.toFixed(2));
+  
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+      },
+      xAxis: {
+        type: 'category',
+        data: xAxisData,
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          name: 'Spending',
+          type: 'bar',
+          data: seriesData,
+          itemStyle: {
+            color: '#1890ff',
+          },
+        },
+      ],
+    };
+  };
+  
+
   const getSpending = async (start_date, end_date) => {
+    if (!start_date || !end_date) {
+      alert('Please enter a valid date range.');
+      return;
+    }
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    const today = new Date();
+    if (end < start || start > today || end > new Date(start.setFullYear(start.getFullYear() + 1))) {
+      alert('Please enter a valid date range, the end date should be within a year from the start date and start date should be in the future.')
+      return;
+    }
     setDisplayStartDate(start_date);
     setDisplayEndDate(end_date);
     try {
@@ -45,38 +102,38 @@ const CustomerSpending = () => {
       <div className="relative w-2/3 mx-auto">
         <div className="relative px-4 my-auto bg-gray-100 shadow-lg sm:rounded-3xl sm:p-20">
           <div className="mx-auto">
+          <div className="cursor-pointer mb-4" onClick={() => navigate("/customerDashboard")}>
+              <BiArrowBack className="text-3xl text-gray-800" />
+            </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">{userFirstName} {userLastName}, here's your spending summary:</h1>
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Your Total Spending between <span className='text-blue-600'>{displayStartDate}</span> and <span className='text-blue-600'>{displayEndDate}</span> is <span className="text-red-500 font-bold">${totalSpending.toFixed(2)}</span></h2>
+            </div>
             <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Select a date range:</h2>
+              <div className="flex items-center">
+                <label className="mr-2">Start Date:</label>
               <input
                 className="border border-gray-300 rounded p-2"
                 type="date"
                 onChange={(e) => setStartDate(e.target.value)}
               />
+              <label className="mr-2 ml-2">End Date:</label>
               <input
                 className="border border-gray-300 rounded p-2"
                 type="date"
                 onChange={(e) => setEndDate(e.target.value)}
               />
+              <div className="ml-2"> </div>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 onClick={() => getSpending(startDate, endDate)}
               >
                 Get Spending
               </button>
+              </div>
             </div>
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">Total Spending between {displayStartDate} and {displayEndDate}: ${totalSpending.toFixed(2)}</h2>
-            </div>
-            <div>
-              <ul>
-                {spending.map((item, index) => (
-                  <li key={index} className="flex justify-between items-center mb-2">
-                    <span className="text-gray-800 font-medium">{item.month}</span>
-                    <span className="text-gray-800 font-medium">${item.spending.toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ReactECharts option={getBarChartOptions()} />
           </div>
         </div>
       </div>

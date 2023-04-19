@@ -63,8 +63,8 @@ const CustomerFlights = () => {
               <div className="text-xl font-semibold mb-2">
                 {flight.airline_name} - {flight.flight_number}
               </div>
-              <div className="text-sm font-semibold mb-2">
-                purchased for: {flight.first_name} {flight.last_name}
+              <div className="text-lg font-semibold mb-2">
+                Purchased for: {flight.first_name} {flight.last_name}
               </div>
             </div>
             <div className="text-gray-600 mb-4">
