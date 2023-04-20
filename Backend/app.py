@@ -508,6 +508,7 @@ def purchase_ticket():
         })
         return jsonify({"success": True})
     except sqlalchemy.exc.IntegrityError as e:
+        print(e)
         return jsonify({"success": False, "error": "duplicate ticket"})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
@@ -727,6 +728,31 @@ def change_flight_status():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/staff/getAllCustomers", methods=["GET"])
+@staff_login_required
+def get_all_customers():
+    airline_name = session['airline_name']
+    flight_number = request.args.get("flight_number")
+    dept_date_time = request.args.get("dept_date_time")
+
+    if not flight_number or not dept_date_time:
+        return jsonify({"success": False, "error": "missing field"})
+
+    dept_date_time = datetime.strptime(dept_date_time, '%a, %d %b %Y %H:%M:%S %Z')
+    dept_date_time = dept_date_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    try:
+        query = '''
+            SELECT * FROM Customer
+            WHERE email IN (
+                SELECT email FROM Ticket
+                WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
+            )
+        '''
+        result = db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, fetch=True)
+        return jsonify({"success": True, "customers": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
     
 
 if __name__ == "__main__":
