@@ -754,6 +754,33 @@ def get_all_customers():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     
+@app.route("/staff/getRatings", methods=["GET"])
+@staff_login_required
+def get_ratings():
+    airline_name = session['airline_name']
+    flight_number = request.args.get("flight_number")
+    dept_date_time = request.args.get("dept_date_time")
+
+    if not flight_number or not dept_date_time:
+        return jsonify({"success": False, "error": "missing field"})
+
+    dept_date_time = datetime.strptime(dept_date_time, '%a, %d %b %Y %H:%M:%S %Z')
+    dept_date_time = dept_date_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    try:
+        query = '''
+            SELECT * FROM Rate
+            WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
+        '''
+        result = db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, fetch=True)
+        avg_rating = 0
+        for rating in result:
+            avg_rating += int(rating['rating'])
+        avg_rating /= len(result)
+        return jsonify({"success": True, "ratings": result, "avg_rating": avg_rating})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

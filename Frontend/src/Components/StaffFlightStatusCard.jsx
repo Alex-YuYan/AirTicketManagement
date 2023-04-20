@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { FaPlaneDeparture, FaPlaneArrival, FaCaretRight, FaCaretDown } from 'react-icons/fa';
 import axios from '../axios';
-import { useNavigate } from 'react-router-dom';
 
 const StaffFlightStatusCard = ({ flight }) => {
-  const navigate = useNavigate();
   const [flightStatus, setFlightStatus] = useState(flight.status);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdown2Open, setDropdown2Open] = useState(false);
   const [customerList, setCustomerList] = useState([]);
+  const [ratingList, setRatingList] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
+
+  const currentDate = new Date();
 
   const changeStatus = async () => {
     try {
@@ -33,6 +36,13 @@ const StaffFlightStatusCard = ({ flight }) => {
     }
   };
 
+  const toggleDropdown2 = () => {
+    setDropdown2Open(!dropdown2Open);
+    if (!dropdown2Open && ratingList.length === 0) {
+      fetchRatingList();
+    }
+  };
+
   const fetchCustomerList = async () => {
     try {
       const res = await axios.get('/staff/getAllCustomers',
@@ -49,6 +59,25 @@ const StaffFlightStatusCard = ({ flight }) => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const fetchRatingList = async () => {
+    try {
+      const res = await axios.get('/staff/getRatings', {
+        params: {
+          flight_number: flight.flight_number,
+          dept_date_time: flight.dept_date_time,
+        }
+      })
+      if (res.data && res.data.success === true) {
+        setRatingList(res.data.ratings);
+        setAvgRating(res.data.avg_rating);
+      } else {
+        alert('Failed to fetch rating list.');
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -90,6 +119,28 @@ const StaffFlightStatusCard = ({ flight }) => {
             {customerList.map((customer, index) => (
               <li key={index} className="text-sm">
                 {customer.first_name} {customer.last_name} - {customer.email}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {
+        currentDate > new Date(flight.arrival_date_time) ?
+          <div className="flex justify-start items-center mt-2 cursor-pointer" onClick={toggleDropdown2}>
+            {dropdown2Open ? <FaCaretDown /> : <FaCaretRight />}
+            <p className="ml-1">Comment & Rating List</p>
+          </div>
+          : null
+      }
+      {dropdown2Open && (
+        <div className="mt-4 border-t border-gray-300 pt-4">
+          <p className="text-lg font-semibold">Average Rating: {avgRating} / 5</p>
+          <ul className="space-y-2">
+            {ratingList.map((rating, index) => (
+              <li key={index} className="text-sm border-2 rounded-md p-2">
+                <p className='text-blue-600 font-semibold'>{rating.email}</p>
+                <p>Rating: {rating.rating} / 5</p>
+                <p>Comment: {rating.comment} </p>
               </li>
             ))}
           </ul>
