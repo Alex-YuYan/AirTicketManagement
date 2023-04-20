@@ -15,6 +15,9 @@ const StaffFlights = () => {
   const [source, setSource] = useState('');
   const [destination, setDestination] = useState('');
 
+  const [departureAirports, setDepartureAirports] = useState([]);
+  const [arrivalAirports, setArrivalAirports] = useState([]);
+
   useEffect(() => {
     const getFlights = async () => {
       try {
@@ -35,6 +38,22 @@ const StaffFlights = () => {
         console.error(error);
       }
     };
+
+    const fetchAirports = async () => {
+      try {
+        const res = await axios.get('/list/airports');
+        if (res.data && res.data.success === false) {
+          alert(res.data.error);
+        } else {
+          setDepartureAirports(res.data.airports);
+          setArrivalAirports(res.data.airports);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchAirports();
     getFlights();
   }, []);
 
@@ -86,20 +105,34 @@ const StaffFlights = () => {
               onChange={(e) => setEndDate(e.target.value)}
               placeholder="End Date"
             />
-            <input
-              type="text"
-              className="border rounded p-2"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              placeholder="Source Airport/City"
-            />
-            <input
-              type="text"
-              className="border rounded p-2"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              placeholder="Destination Airport/City"
-            />
+            <select
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="deptAirport"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                required
+              >
+                <option value="">Select a departure airport</option>
+                {departureAirports.map((airport) => (
+                  <option key={airport.code} value={airport.code}>
+                    {airport.name} ({airport.code})
+                  </option>
+                ))}
+            </select>
+            <select
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="destAirport"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                required
+              >
+                <option value="">Select a destination airport</option>
+                {departureAirports.map((airport) => (
+                  <option key={airport.code} value={airport.code}>
+                    {airport.name} ({airport.code})
+                  </option>
+                ))}
+            </select>
           </div>
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full" onClick={handleSearch}> Search </button>
           {flights.map((flight, index) => (

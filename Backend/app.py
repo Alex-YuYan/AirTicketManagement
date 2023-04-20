@@ -95,13 +95,14 @@ def get_month_spending(start_date, end_date):
 
 def get_airport_name(code):
     query = "SELECT name FROM Airport WHERE code = :code"
-    result = db.execute(query, {"airport_code": code}, fetch=True)
+    result = db.execute(query, {"code": code}, fetch=True)
     return result[0]['name']
 
 def get_city_name(code):
     query = "SELECT city FROM Airport WHERE code = :code"
     result = db.execute(query, {"airport_code": code}, fetch=True)
     return result[0]['city']
+
 
 '''
     User Authentication Related
@@ -569,7 +570,7 @@ def get_flights():
         elif len(destination) > 0:
             query = '''
                 SELECT * FROM Flight
-                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date AND dept_airport = :destination
+                WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date AND arrival_airport = :destination
             '''
         else:
             query = '''
@@ -578,6 +579,9 @@ def get_flights():
             '''
         result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date, "source": source, "destination": destination}, fetch=True)
         result = [dict(row) for row in result]
+        for each in result:
+            each['dept_airport'] = get_airport_name(each['dept_airport'])
+            each['arrival_airport'] = get_airport_name(each['arrival_airport'])
         print(result)
         return jsonify({"success": True, "flights": result})
     except Exception as e:
@@ -640,6 +644,90 @@ def add_airplane():
         return jsonify({"success": False, "error": "duplicate airplane"})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
+
+@app.route("/staff/airplane", methods=["GET"])
+@staff_login_required
+def get_airplane():
+    airline_name = session['airline_name']
+    query = '''
+        SELECT * FROM Airplane
+        WHERE airline_name = :airline_name
+    '''
+    try:
+        result = db.execute(query, {"airline_name": airline_name}, fetch=True)
+        # return all ids
+        result = [row['airplane_id'] for row in result]
+        return jsonify({"success": True, "airplanes": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
+@app.route("/staff/flights", methods=["POST"])
+@staff_login_required
+def add_flight():
+    airline_name = session['airline_name']
+    flight_number = request.json.get("flight_number")
+    dept_date_time = request.json.get("dept_date_time")
+    airplane_id = request.json.get("airplane_id")
+    arrival_date_time = request.json.get("arrival_date_time")
+    base_price = request.json.get("base_price")
+    status = request.json.get("status")
+    dept_airport = request.json.get("dept_airport")
+    arrival_airport = request.json.get("arrival_airport")
+
+    if not flight_number or not dept_date_time or not airplane_id or not arrival_date_time or not base_price or not status or not dept_airport or not arrival_airport:
+        return jsonify({"success": False, "error": "missing field"})
+    
+    dept_date_time = datetime.strptime(dept_date_time, '%Y-%m-%dT%H:%M')
+    dept_date_time = dept_date_time.strftime('%Y-%m-%d %H:%M:%S')
+    arrival_date_time = datetime.strptime(arrival_date_time, '%Y-%m-%dT%H:%M')
+    arrival_date_time = arrival_date_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    query = '''
+        INSERT INTO Flight (airline_name, flight_number, dept_date_time, airplane_id, arrival_date_time, base_price, status, dept_airport, arrival_airport)
+        VALUES (:airline_name, :flight_number, :dept_date_time, :airplane_id, :arrival_date_time, :base_price, :status, :dept_airport, :arrival_airport)
+    '''
+
+    try:
+        db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time, "airplane_id": airplane_id, "arrival_date_time": arrival_date_time, "base_price": base_price, "status": status, "dept_airport": dept_airport, "arrival_airport": arrival_airport})
+        return jsonify({"success": True})
+    except sqlalchemy.exc.IntegrityError as e:
+        return jsonify({"success": False, "error": "duplicate flight"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
+@app.route("/staff/changeFlightStatus", methods=["POST"])
+@staff_login_required
+def change_flight_status():
+    airline_name = session['airline_name']
+    flight_number = request.json.get("flight_number")
+    dept_date_time = request.json.get("dept_date_time")
+
+    if not flight_number or not dept_date_time:
+        return jsonify({"success": False, "error": "missing field"})
+
+    dept_date_time = datetime.strptime(dept_date_time, '%a, %d %b %Y %H:%M:%S %Z')
+    dept_date_time = dept_date_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    try:
+        query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time"
+        result = db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, fetch=True)
+        if len(result) == 0:
+            return jsonify({"success": False, "error": "flight not found"})
+        else:
+            if result[0]["status"] == 'on-time':
+                query = "UPDATE Flight SET status = 'delayed' WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time"
+                db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time})
+                return jsonify({"success": True, "status": "delayed"})
+            elif result[0]["status"] == 'delayed':
+                query = "UPDATE Flight SET status = 'on-time' WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time"
+                db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time})
+                return jsonify({"success": True, "status": "on-time"})
+            else:
+                return jsonify({"success": False, "error": "invalid status"})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+
+    
 
 if __name__ == "__main__":
     app.run(debug=True)

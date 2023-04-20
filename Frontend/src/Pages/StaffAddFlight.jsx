@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
 import { BiArrowBack } from 'react-icons/bi';
 
-const AddFlight = () => {
+const StaffAddFlight = () => {
   const [flightNumber, setFlightNumber] = useState('');
   const [deptDateTime, setDeptDateTime] = useState('');
   const [airplaneId, setAirplaneId] = useState('');
@@ -19,24 +19,16 @@ const AddFlight = () => {
 
   const navigate = useNavigate();
 
-  const sampleAirplaneIds = ['A1', 'A2', 'A3'];
-  const sampleDepartureAirports = [
-    { code: 'JFK', name: 'John F. Kennedy International Airport' },
-    { code: 'LAX', name: 'Los Angeles International Airport' },
-    { code: 'ORD', name: 'O\'Hare International Airport' },
-  ];
-  const sampleArrivalAirports = [
-    { code: 'LHR', name: 'London Heathrow Airport' },
-    { code: 'CDG', name: 'Charles de Gaulle Airport' },
-    { code: 'AMS', name: 'Amsterdam Airport Schiphol' },
-  ];
-
   useEffect(() => {
     const fetchAirplaneIds = async () => {
       try {
         // Replace with your API call
-        const res = await axios.get('/api/airplanes');
-        setAirplaneIds(res.data);
+        const res = await axios.get('/staff/airplane');
+        if (res.data && res.data.success === false) {
+          alert(res.data.error);
+        } else {
+          setAirplaneIds(res.data.airplanes);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -44,10 +36,13 @@ const AddFlight = () => {
 
     const fetchAirports = async () => {
       try {
-        // Replace with your API call
-        const res = await axios.get('/api/airports');
-        setDepartureAirports(res.data);
-        setArrivalAirports(res.data);
+        const res = await axios.get('/list/airports');
+        if (res.data && res.data.success === false) {
+          alert(res.data.error);
+        } else {
+          setDepartureAirports(res.data.airports);
+          setArrivalAirports(res.data.airports);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -92,13 +87,6 @@ const AddFlight = () => {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    // Replace the sample data with your API call
-    setAirplaneIds(sampleAirplaneIds);
-    setDepartureAirports(sampleDepartureAirports);
-    setArrivalAirports(sampleArrivalAirports);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-purple-400 to-green-400 py-6 flex flex-col justify-center sm:py-12">
@@ -261,4 +249,4 @@ const AddFlight = () => {
   );
 };
 
-export default AddFlight;
+export default StaffAddFlight;
