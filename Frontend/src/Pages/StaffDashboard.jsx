@@ -34,12 +34,12 @@ const StaffDashboard = () => {
           <div className="mx-auto">
             <div className="flex justify-left -mb-16 ml-4">
               <div className="flex">
-                <FaUser className="text-red-800 w-10 h-10" />
-                <h1 className="text-4xl font-medium marker:text-opacity-80 text-black ml-4">Welcome, {userFirstName} {userLastName} from {userAirline}!</h1>
+                <FaUser className="text-amber-200 w-10 h-10" />
+                <h1 className="text-4xl font-medium marker:text-opacity-80 text-white ml-4">Welcome, {userFirstName} {userLastName} from {userAirline}!</h1>
               </div>
             </div>
-            <div className="bg-cover bg-center h-96 mb-6 rounded-lg shadow-xl" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/17043/d-abvm-lufthansa-boeing-747-430_PlanespottersNet_1208292_c45f636647_o.jpg)` }}></div>
-            <div className="grid grid-cols-4 gap-6">
+            <div className="bg-cover bg-center h-96 mb-6 rounded-lg shadow-xl" style={{ backgroundImage: `url(https://cdn.plnspttrs.net/45497/b-2732-china-southern-airlines-boeing-787-8-dreamliner_PlanespottersNet_415010_0682bca3e6_o.jpg)` }}></div>
+            <div className="grid grid-cols-3 gap-6">
               <button className="bg-orange-100 hover:bg-orange-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffFlights")}>
                 <FaSearch className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">View Flights</span>
@@ -55,14 +55,6 @@ const StaffDashboard = () => {
               <button className="bg-purple-100 hover:bg-purple-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffAirports")}>
                 <FaStar className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Add Airport</span>
-              </button>
-              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">View Ratings</span>
-              </button>
-              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
-                <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
-                <span className="text-xl font-bold ml-4">Frequent Customers</span>
               </button>
               <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
