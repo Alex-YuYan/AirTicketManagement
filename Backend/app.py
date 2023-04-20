@@ -93,6 +93,40 @@ def get_month_spending(start_date, end_date):
     
     return spending
 
+def get_month_sold(airline_name, start_date, end_date):
+    # for each month between start_date and end_date, get the total number of tickets sold
+    # return a list of tuples (month, num_sold)
+    # start_date and end_date are in the format of "YYYY-MM-DD"
+
+    # parse start_date and end_date
+    start_year, start_month, start_day = start_date.split("-")
+    end_year, end_month, end_day = end_date.split("-")
+
+    # get the number of months between start_date and end_date
+    num_months = (int(end_year) - int(start_year)) * 12 + (int(end_month) - int(start_month)) + 1
+
+    # get the number of tickets sold for each month
+    num_sold = []
+    for i in range(num_months):
+        # get the start and end date of the current month
+        year = int(start_year) + int((int(start_month) + i - 1) / 12)
+        month = (int(start_month) + i - 1) % 12 + 1
+        if i == 0:
+            start_date = str(year) + "-" + str(month) + "-" + start_day + " 00:00:00"
+        else:
+            start_date = str(year) + "-" + str(month) + "-01" + " 00:00:00"
+        # if not the last month, end date is the last day of the month, which varies by month
+        end_date = str(year) + "-" + str(month) + "-" + str(monthrange(year, month)[1]) + " 23:59:59"
+        if i == num_months - 1:
+            end_date = end_year + "-" + end_month + "-" + end_day + " 23:59:59"
+        
+        # get the number of tickets sold for the current month
+        query = "SELECT COUNT(*) AS num_sold FROM Ticket WHERE purchase_date_time >= :start_date AND purchase_date_time <= :end_date AND airline_name = :airline_name"
+        result = db.execute(query, {"start_date": start_date, "end_date": end_date}, fetch=True)
+        num_sold.append((start_date, result[0]['num_sold']))
+    
+    return num_sold
+
 def get_airport_name(code):
     query = "SELECT name FROM Airport WHERE code = :code"
     result = db.execute(query, {"code": code}, fetch=True)
@@ -781,6 +815,68 @@ def get_ratings():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
 
+@app.route("/staff/getFreqCustomers", methods=["GET"])
+@staff_login_required
+def get_freq_customers():
+    airline_name = session['airline_name']
+    query = '''
+        SELECT email, COUNT(*) AS num_tickets FROM Ticket
+        WHERE airline_name = :airline_name
+        GROUP BY email
+        ORDER BY num_tickets DESC
+    '''
+    try:
+        result = db.execute(query, {"airline_name": airline_name}, fetch=True)
+        nameQuery = '''
+            SELECT first_name, last_name FROM Customer
+            WHERE email = :email
+        '''
+        for customer in result:
+            name = db.execute(nameQuery, {"email": customer['email']}, fetch=True)
+            customer['first_name'] = name[0]['first_name']
+            customer['last_name'] = name[0]['last_name']
+        return jsonify({"success": True, "customers": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    
+@app.route("/staff/getTicketsSold", methods=["GET"])
+@staff_login_required
+def get_tickets_sold():
+    airline_name = session['airline_name']
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    if not start_date or not end_date:
+        return jsonify({"success": False, "error": "missing field"})
+    
+    start_date = start_date + " 00:00:00"
+    end_date = end_date + " 23:59:59"
+
+    try:
+        query = '''
+            SELECT COUNT(*) AS num_tickets FROM Ticket
+            WHERE airline_name = :airline_name AND purchase_date_time BETWEEN :start_date AND :end_date
+        '''
+        result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date}, fetch=True)
+        return jsonify({"success": True, "num_tickets": result[0]['num_tickets']})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    
+@app.route("/staff/getTicketSoldMonthly", methods=["GET"])
+@staff_login_required
+def get_tickets_sold_monthly():
+    airline_name = session['airline_name']
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    if not start_date or not end_date:
+        return jsonify({"success": False, "error": "missing field"})
+    
+    try:
+        result = get_month_sold(airline_name, start_date, end_date)
+        return jsonify({"success": True, "tickets_sold": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
 
 if __name__ == "__main__":
     app.run(debug=True)
