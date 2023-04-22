@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlaneDeparture, FaPlaneArrival, FaCaretRight, FaCaretDown } from 'react-icons/fa';
+import { FaPlaneDeparture, FaPlaneArrival, FaCaretRight, FaCaretDown, FaArrowRight } from 'react-icons/fa';
 import axios from '../axios';
+import { useNavigate } from 'react-router-dom';
+import { FiArrowRight } from 'react-icons/fi';
 
 const StaffFlightStatusCard = ({ flight }) => {
   const [flightStatus, setFlightStatus] = useState(flight.status);
@@ -9,6 +11,7 @@ const StaffFlightStatusCard = ({ flight }) => {
   const [customerList, setCustomerList] = useState([]);
   const [ratingList, setRatingList] = useState([]);
   const [avgRating, setAvgRating] = useState(0);
+  const navigate = useNavigate();
 
   const currentDate = new Date();
 
@@ -121,8 +124,9 @@ const StaffFlightStatusCard = ({ flight }) => {
         <div className="mt-4 border-t border-gray-300 pt-4">
           <ul className="space-y-2">
             {customerList.map((customer, index) => (
-              <li key={index} className="text-sm">
-                {customer.first_name} {customer.last_name} - {customer.email}
+              <li key={index} className="text-sm border-solid border-blue-600 border-2 rounded-md p-2 cursor-pointer mx-2" onClick={() => navigate("/staffViewRecord/" + customer.email)}>
+                {customer.first_name} {customer.last_name} - purchased under {customer.email}
+                <FaArrowRight className="float-right text-blue-700" />
               </li>
             ))}
           </ul>

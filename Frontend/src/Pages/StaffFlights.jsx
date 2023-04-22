@@ -127,7 +127,7 @@ const StaffFlights = () => {
                 required
               >
                 <option value="">Select a destination airport</option>
-                {departureAirports.map((airport) => (
+                {arrivalAirports.map((airport) => (
                   <option key={airport.code} value={airport.code}>
                     {airport.name} ({airport.code})
                   </option>

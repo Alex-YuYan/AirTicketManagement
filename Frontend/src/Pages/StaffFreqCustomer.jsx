@@ -36,7 +36,7 @@ const StaffFreqCustomer = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
             {customers.map((customer) => (
-              <div key={customer.email} className="bg-white hover:bg-zinc-100 rounded-lg p-4 shadow-md cursor-pointer flex flex-col">
+              <div key={customer.email} className="bg-white hover:bg-zinc-100 rounded-lg p-4 shadow-md cursor-pointer flex flex-col" onClick={() => navigate("/staffViewRecord/" + customer.email)}>
                 <div className="flex-grow">
                   <h2 className="text-xl font-semibold mb-2 flex items-center">
                     <BiUser className="mr-2" /> {customer.first_name} {customer.last_name}

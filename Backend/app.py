@@ -777,11 +777,8 @@ def get_all_customers():
 
     try:
         query = '''
-            SELECT * FROM Customer
-            WHERE email IN (
-                SELECT email FROM Ticket
-                WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
-            )
+            SELECT email, first_name, last_name FROM Ticket
+            WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
         '''
         result = db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, fetch=True)
         return jsonify({"success": True, "customers": result})
@@ -884,6 +881,30 @@ def get_tickets_sold_monthly():
         return jsonify({"success": True, "tickets_sold": result})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
+    
+@app.route("/staff/getCustomerRecord", methods=["GET"])
+@staff_login_required
+def get_customer_record():
+    query = '''
+        SELECT Flight.*, Ticket.id, Ticket.price, Ticket.first_name, Ticket.last_name
+        FROM Flight
+        INNER JOIN Ticket ON Ticket.flight_number = Flight.flight_number
+            AND Ticket.dept_date_time = Flight.dept_date_time
+            AND Ticket.airline_name = Flight.airline_name
+            AND Flight.airline_name = :airline_name
+        WHERE Ticket.email = :email
+    '''
+    email = request.args.get("email")
+    airline_name = session['airline_name']
+
+    if not email:
+        return jsonify({"success": False, "error": "missing field"})
+    
+    try:
+        result = db.execute(query, {"email": email, "airline_name" : airline_name}, fetch=True)
+    except Exception as e:
+        return jsonify({"success": False, "error": "database error"})
+    return jsonify({"success": True, "flights": result})
 
 if __name__ == "__main__":
     app.run(debug=True)
