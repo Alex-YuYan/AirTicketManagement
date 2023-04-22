@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from calendar import monthrange
 from functools import wraps
 import hashlib
@@ -821,14 +821,19 @@ def get_ratings():
 @staff_login_required
 def get_freq_customers():
     airline_name = session['airline_name']
+
+    # Get purchase within last year
+    a_year_ago = datetime.now() - timedelta(days=365)
+    a_year_ago = a_year_ago.strftime('%Y-%m-%d %H:%M:%S')
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     query = '''
         SELECT email, COUNT(*) AS num_tickets FROM Ticket
-        WHERE airline_name = :airline_name
+        WHERE airline_name = :airline_name AND dept_date_time BETWEEN :a_year_ago AND :now
         GROUP BY email
         ORDER BY num_tickets DESC
     '''
     try:
-        result = db.execute(query, {"airline_name": airline_name}, fetch=True)
+        result = db.execute(query, {"airline_name": airline_name, "a_year_ago": a_year_ago, "now": now}, fetch=True)
         nameQuery = '''
             SELECT first_name, last_name FROM Customer
             WHERE email = :email

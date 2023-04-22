@@ -56,15 +56,19 @@ const StaffDashboard = () => {
                 <FaStar className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Add Airport</span>
               </button>
+              <button className=" bg-pink-100 hover:bg-pink-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffFreqCustomer")}>
+                <FaUser className="text-gray-700 w-10 h-10" />
+                <span className="text-xl font-bold ml-4">Customers</span>
+              </button>
               <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
                 <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">View Reports</span>
               </button>
-              <button className="bg-gray-100 hover:bg-gray-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => setIsOpen(true)}>
+            </div>
+            <button className="bg-gray-100 hover:bg-gray-200 p-6 rounded-lg flex items-center justify-center shadow-md w-full mt-6" onClick={() => setIsOpen(true)}>
                 <FaSignOutAlt className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Log Out</span>
-              </button>
-            </div>
+            </button>
           </div>
         </div>
       </div>
