@@ -807,6 +807,8 @@ def get_ratings():
             WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time = :dept_date_time
         '''
         result = db.execute(query, {"airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time}, fetch=True)
+        if len(result) == 0:
+            return jsonify({"success": True, "ratings": [], "avg_rating": -1})
         avg_rating = 0
         for rating in result:
             avg_rating += int(rating['rating'])

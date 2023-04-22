@@ -72,7 +72,11 @@ const StaffFlightStatusCard = ({ flight }) => {
       })
       if (res.data && res.data.success === true) {
         setRatingList(res.data.ratings);
-        setAvgRating(res.data.avg_rating);
+        if (res.data.avg_rating === -1) {
+          setAvgRating('N/A');
+        } else {
+          setAvgRating(res.data.avg_rating + " / 5");
+        }
       } else {
         alert('Failed to fetch rating list.');
       }
@@ -134,7 +138,7 @@ const StaffFlightStatusCard = ({ flight }) => {
       }
       {dropdown2Open && (
         <div className="mt-4 border-t border-gray-300 pt-4">
-          <p className="text-lg font-semibold">Average Rating: {avgRating} / 5</p>
+          <p className="text-lg font-semibold">Average Rating: {avgRating}</p>
           <ul className="space-y-2">
             {ratingList.map((rating, index) => (
               <li key={index} className="text-sm border-2 rounded-md p-2">
