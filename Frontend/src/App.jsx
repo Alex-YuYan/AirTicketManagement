@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Landing from './Pages/Landing';
 import CustomerDashboard from './Pages/CustomerDashboard';
 import { Routes, Route } from 'react-router-dom';
-import RequireAuth from './Auth/RequireAuth';
+import { RequireCustomerAuth, RequireStaffAuth} from './Auth/RequireAuth';
 import NotFound from './Pages/NotFound';
 import CustomerFlights from './Pages/CustomerFlights';
 import PublicSearch from './Pages/PublicSearch';
@@ -22,11 +22,13 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/publicSearch" element={<PublicSearch />} />
-      <Route element={<RequireAuth />}>
+      <Route element={<RequireCustomerAuth />}>
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
         <Route path="/customerFlights" element={<CustomerFlights />} />
         <Route path='/customerSearch' element={<CustomerSearch />} />
         <Route path='/customerSpending' element={<CustomerSpending />} />
+      </Route>
+      <Route element={<RequireStaffAuth />}>
         <Route path='/staffDashboard' element={<StaffDashboard />} />
         <Route path='/staffFlights' element={<StaffFlights />} />
         <Route path='/staffAirports' element={<StaffAirports />} />
