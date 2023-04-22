@@ -47,7 +47,7 @@ const StaffAirports = () => {
     <div className="min-h-screen bg-gradient-to-tr from-purple-400 to-green-400 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative w-2/3 mx-auto">
         <div className="relative px-4 my-auto bg-gray-100 shadow-lg sm:rounded-3xl sm:p-20">
-        <div className="flex justify-center">
+          <div className="flex justify-center">
             <div className="cursor-pointer" onClick={() => navigate('/staffDashboard')}>
               <BiArrowBack className="text-3xl text-gray-800" />
             </div>

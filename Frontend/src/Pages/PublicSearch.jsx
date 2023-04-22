@@ -19,21 +19,31 @@ const PublicSearch = () => {
   const [flightsData, setFlightsData] = useState([]);
   const [searched, setSearched] = useState(false);
   const [statusData, setStatusData] = useState([]);
+  const [departureAirports, setDepartureAirports] = useState([]);
+  const [arrivalAirports, setArrivalAirports] = useState([]);
 
   const navigate = useNavigate();
 
   const currentDate = new Date();
   const minDate = currentDate.toISOString().split('T')[0];
 
-  // const checkDates = useEffect(() => {
-  //   if (departureDate < minDate) {
-  //     setDepartureDate(minDate);
-  //   } else if (departureDate > returnDate) {
-  //     setReturnDate(departureDate);
-  //   } else if (returnDate < minDate) {
-  //     setReturnDate(minDate);
-  //   }
-  // }, [departureDate, returnDate]);
+  useEffect(() => {
+    const fetchAirports = async () => {
+      try {
+        const res = await axios.get('/list/airports');
+        if (res.data && res.data.success === false) {
+          alert(res.data.error);
+        } else {
+          setDepartureAirports(res.data.airports);
+          setArrivalAirports(res.data.airports);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchAirports();
+  }, []);
 
   const handleSearch = async () => {
     // console.log(source, destination, departureDate, returnDate, tripType);
@@ -146,22 +156,34 @@ const PublicSearch = () => {
                 </Menu>
                 <form>
                   <div className="mt-4 grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Source"
+                    <select
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="deptAirport"
                       value={source}
                       onChange={(e) => setSource(e.target.value)}
-                      className="border border-gray-300 p-2 rounded-md"
-                      required={true}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Destination"
+                      required
+                    >
+                      <option value="">Select a departure airport</option>
+                      {departureAirports.map((airport) => (
+                        <option key={airport.code} value={airport.code}>
+                          {airport.name} ({airport.code})
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="destAirport"
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
-                      className="border border-gray-300 p-2 rounded-md"
-                      required={true}
-                    />
+                      required
+                    >
+                      <option value="">Select a destination airport</option>
+                      {departureAirports.map((airport) => (
+                        <option key={airport.code} value={airport.code}>
+                          {airport.name} ({airport.code})
+                        </option>
+                      ))}
+                    </select>
                     <input
                       type="date"
                       value={departureDate}
@@ -242,7 +264,7 @@ const PublicSearch = () => {
                     </button>
                   </form>
                 </div>
-                                {statusData.length > 0 ? (
+                {statusData.length > 0 ? (
                   <div className="container mx-auto p-4">
                     <h1 className="text-3xl font-bold mb-6">Flight Status</h1>
                     <div className="grid grid-cols-1 gap-4">
