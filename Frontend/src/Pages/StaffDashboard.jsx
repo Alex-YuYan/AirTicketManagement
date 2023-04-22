@@ -60,7 +60,7 @@ const StaffDashboard = () => {
                 <FaUser className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">Customers</span>
               </button>
-              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md">
+              <button className="bg-emerald-100 hover:bg-emerald-200 p-6 rounded-lg flex items-center shadow-md" onClick={() => navigate("/staffReport")}>
                 <FaMoneyBillWave className="text-gray-700 w-10 h-10" />
                 <span className="text-xl font-bold ml-4">View Reports</span>
               </button>

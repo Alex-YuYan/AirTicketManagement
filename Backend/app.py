@@ -122,8 +122,8 @@ def get_month_sold(airline_name, start_date, end_date):
         
         # get the number of tickets sold for the current month
         query = "SELECT COUNT(*) AS num_sold FROM Ticket WHERE purchase_date_time >= :start_date AND purchase_date_time <= :end_date AND airline_name = :airline_name"
-        result = db.execute(query, {"start_date": start_date, "end_date": end_date}, fetch=True)
-        num_sold.append((start_date, result[0]['num_sold']))
+        result = db.execute(query, {"start_date": start_date, "end_date": end_date, "airline_name": airline_name}, fetch=True)
+        num_sold.append((start_date[:-12], result[0]['num_sold']))
     
     return num_sold
 
@@ -846,9 +846,9 @@ def get_freq_customers():
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     
-@app.route("/staff/getTicketsSold", methods=["GET"])
+@app.route("/staff/getRevenue", methods=["GET"])
 @staff_login_required
-def get_tickets_sold():
+def get_revenue():
     airline_name = session['airline_name']
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
@@ -861,11 +861,11 @@ def get_tickets_sold():
 
     try:
         query = '''
-            SELECT COUNT(*) AS num_tickets FROM Ticket
+            SELECT SUM(price) AS revenue FROM Ticket
             WHERE airline_name = :airline_name AND purchase_date_time BETWEEN :start_date AND :end_date
         '''
         result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date}, fetch=True)
-        return jsonify({"success": True, "num_tickets": result[0]['num_tickets']})
+        return jsonify({"success": True, "revenue": result[0]['revenue']})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
     
