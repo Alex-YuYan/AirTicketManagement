@@ -16,7 +16,6 @@ const CustomerDashboard = () => {
     if (res.data && res.data.success === true) {
       setLoggedIn(false);
       setIsOpen(false);
-      alert('You have been logged out.');
       naviagte('/');
     } else {
       alert('Something went wrong.');

@@ -17,7 +17,6 @@ const StaffDashboard = () => {
       if (res.data && res.data.success === true) {
         setLoggedIn(false);
         setIsOpen(false);
-        alert('You have been logged out.');
         navigate('/');
       } else {
         alert('Something went wrong. Please try again.');
