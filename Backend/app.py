@@ -275,7 +275,7 @@ def staff_register():
         :username, :password, :first_name, :last_name, :airline_name, :date_of_birth
     )"""
 
-    if not username or not password or not first_name or not last_name or not airline_name or not date_of_birth or not emails:
+    if not username or not password or not first_name or not last_name or not airline_name or not date_of_birth or not emails or len(emails) == 0:
         return jsonify({"success": False, "error": "Missing required information"})
     
     try:
@@ -346,6 +346,8 @@ def search_oneway():
             validCheck = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
             if validCheck > 0:
                 flight['price'] = validCheck
+                flight['dept_airport'] = get_airport_name(flight['dept_airport'])
+                flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
                 valid_flights.append(flight)
             else:
                 continue
@@ -381,11 +383,23 @@ def search_roundtrip():
                                 "return_date_next_day": return_date_next_day},
                         fetch=True)
         if len(dept_result) == 0 or len(return_result) == 0:
-            return jsonify({"success": False, "error": "No flight found for the roundtrip"})
+            return jsonify({"success": False, "error": "No flight found for the roundtrip (Maybe there is flight for one way, but not for the other)"})
         for flight in dept_result:
-            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+            validCheck = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+            if validCheck > 0:
+                flight['price'] = validCheck
+                flight['dept_airport'] = get_airport_name(flight['dept_airport'])
+                flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
+            else:
+                continue
         for flight in return_result:
-            flight['price'] = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+            validCheck = float(get_ticket_price(flight['flight_number'], flight['dept_date_time'], flight['airline_name']))
+            if validCheck > 0:
+                flight['price'] = validCheck
+                flight['dept_airport'] = get_airport_name(flight['dept_airport'])
+                flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
+            else:
+                continue
         return jsonify({"success": True, "dept_flights": dept_result, "return_flights": return_result})
     except Exception as e:
         print(e)
@@ -396,41 +410,41 @@ def search_status():
     airline_name = request.args.get("airline_name")
     flight_number = request.args.get("flight_number")
     dept_date_time = request.args.get("dept_date_time")
-    arrival_date_time = request.args.get("arrival_date_time")
-    if dept_date_time is None:
-        arrival_date_next_day = arrival_date_time + " 23:59:59"
-        arrival_date_time = arrival_date_time + " 00:00:00"
-        query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND arrival_date_time BETWEEN :arrival_date_time AND :arrival_date_next_day"
 
-        try:
-            result = db.execute(query, {"airline_name": airline_name,
-                                    "flight_number": flight_number,
-                                    "arrival_date_time": arrival_date_time,
-                                    "arrival_date_next_day": arrival_date_next_day},
-                            fetch=True)
-            if len(result) == 0:
-                return jsonify({"success": False, "error": "No flight found"})
-            return jsonify({"success": True, "flights": result})
-        except Exception as e:
-            print(e)
-            return jsonify({"success": False, "error": "database error"})
-    else:
-        dept_date_next_day = dept_date_time + " 23:59:59"
-        dept_date_time = dept_date_time + " 00:00:00"
-        query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time BETWEEN :dept_date_time AND :dept_date_next_day"
+    dept_date_next_day = dept_date_time + " 23:59:59"
+    dept_date_time = dept_date_time + " 00:00:00"
+    query = "SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND dept_date_time BETWEEN :dept_date_time AND :dept_date_next_day"
+    
+    try:
+        result = db.execute(query, {"airline_name": airline_name,
+                                "flight_number": flight_number,
+                                "dept_date_time": dept_date_time,
+                                "dept_date_next_day": dept_date_next_day},
+                        fetch=True)
+
+        alternativeQuery = '''
+            SELECT * FROM Flight WHERE airline_name = :airline_name AND flight_number = :flight_number AND arrival_date_time BETWEEN :dept_date_time AND :dept_date_next_day''' 
+        alternativeResult = db.execute(alternativeQuery, {"airline_name": airline_name,
+                            "flight_number": flight_number,
+                            "dept_date_time": dept_date_time,
+                            "dept_date_next_day": dept_date_next_day},
+                    fetch=True)
         
-        try:
-            result = db.execute(query, {"airline_name": airline_name,
-                                    "flight_number": flight_number,
-                                    "dept_date_time": dept_date_time,
-                                    "dept_date_next_day": dept_date_next_day},
-                            fetch=True)
-            if len(result) == 0:
-                return jsonify({"success": False, "error": "No flight found"})
-            return jsonify({"success": True, "flights": result})
-        except Exception as e:
-            print(e)
-            return jsonify({"success": False, "error": "database error"})
+        if len(result) == 0 and len(alternativeResult) == 0:
+            return jsonify({"success": False, "error": "No flight found"})
+
+        for flight in alternativeResult:
+            if flight not in result:
+                result.append(flight)
+        
+        for flight in result:
+            flight['dept_airport'] = get_airport_name(flight['dept_airport'])
+            flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
+
+        return jsonify({"success": True, "flights": result})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "database error"})
 
 @app.route("/list/airports", methods=["GET"])
 def list_airports():
@@ -711,6 +725,9 @@ def add_flight():
 
     if not flight_number or not dept_date_time or not airplane_id or not arrival_date_time or not base_price or not status or not dept_airport or not arrival_airport:
         return jsonify({"success": False, "error": "missing field"})
+    
+    if dept_airport == arrival_airport:
+        return jsonify({"success": False, "error": "departure and arrival airport cannot be the same"})
     
     dept_date_time = datetime.strptime(dept_date_time, '%Y-%m-%dT%H:%M')
     dept_date_time = dept_date_time.strftime('%Y-%m-%d %H:%M:%S')
