@@ -115,7 +115,7 @@ const PublicSearch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-amber-400 to-cyan-500 py-6 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-white py-6 flex flex-col justify-center sm:py-12">
       <div className="relative w-2/3 mx-auto">
         <div className="bg-gray-100 p-6 rounded-lg">
           <div className="flex justify-center">
