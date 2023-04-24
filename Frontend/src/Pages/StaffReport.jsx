@@ -109,7 +109,6 @@ const StaffReport = () => {
           },
         });
         if (res.data && res.data.success === true) {
-          console.log(res.data);
           if (type === 'lastMonth') {
             setLastMonthRevenue(res.data.revenue);
           } else {

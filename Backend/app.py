@@ -879,6 +879,8 @@ def get_revenue():
             WHERE airline_name = :airline_name AND purchase_date_time BETWEEN :start_date AND :end_date
         '''
         result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date}, fetch=True)
+        if result[0]['revenue'] is None:
+            return jsonify({"success": True, "revenue": 0})
         return jsonify({"success": True, "revenue": result[0]['revenue']})
     except Exception as e:
         return jsonify({"success": False, "error": "database error"})
