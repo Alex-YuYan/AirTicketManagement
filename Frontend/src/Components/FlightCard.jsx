@@ -25,7 +25,9 @@ const FlightCard = ({ flight }) => {
         <p className={`text-lg ${flight.status === 'on-time' ? 'text-green-600' : 'text-red-600'}`}>
           Status: {flight.status}
         </p>
-        <p className="text-lg text-orange-600 font-semibold">${flight.price}</p>
+        {
+          flight.price > 0 ? <p className="text-lg text-green-600 font-semibold">${flight.price}</p> : <p className="text-lg text-red-600 font-semibold">Sold Out</p>
+        }
       </div>
     </div>
   );

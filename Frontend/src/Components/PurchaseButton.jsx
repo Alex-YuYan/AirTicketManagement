@@ -2,10 +2,12 @@ import React, { useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { Dialog, Transition } from '@headlessui/react';
 import { RiErrorWarningLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 
 import axios from '../axios';
 
 const PurchaseButton = ({ flight, user }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -39,6 +41,7 @@ const PurchaseButton = ({ flight, user }) => {
         alert('Purchase successful, you may now check your flights.');
         setIsOpen(false);
         reset();
+        navigate('/customerFlights');
       } else {
         alert(response.data.error);
       }
