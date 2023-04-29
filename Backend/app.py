@@ -350,7 +350,10 @@ def search_oneway():
                 flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
                 valid_flights.append(flight)
             else:
-                continue
+                flight['price'] = -1
+                flight['dept_airport'] = get_airport_name(flight['dept_airport'])
+                flight['arrival_airport'] = get_airport_name(flight['arrival_airport'])
+                valid_flights.append(flight)
     except Exception as e:
         print(e)
         return jsonify({"success": False, "error": "database error"})
@@ -842,7 +845,7 @@ def get_freq_customers():
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     query = '''
         SELECT email, COUNT(*) AS num_tickets FROM Ticket
-        WHERE airline_name = :airline_name AND dept_date_time BETWEEN :a_year_ago AND :now
+        WHERE airline_name = :airline_name AND purchase_date_time BETWEEN :a_year_ago AND :now
         GROUP BY email
         ORDER BY num_tickets DESC
     '''
