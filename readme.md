@@ -1,5 +1,5 @@
 # Air Ticket Management System
-A Air Ticket Management System WebApp. It is developed using Flask + ReactJS + MySQL.
+An Air Ticket Management System WebApp. It is developed using Flask + ReactJS + MySQL.
 ## Runnning the application
 1. Clone the repository
 2. Make sure you have python 3 and nodejs installed
