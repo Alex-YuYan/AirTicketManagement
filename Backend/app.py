@@ -474,10 +474,24 @@ def get_customer_flights():
         WHERE Ticket.email = :email
     '''
     email = session['customer_email']
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    if end_date is None or end_date == "":
+        start_date = start_date + " 00:00:00"
+        query = query + " AND Flight.dept_date_time >= :start_date"
+    elif start_date is None or start_date == "":
+        end_date = end_date + " 23:59:59"
+        query = query + " AND Flight.dept_date_time <= :end_date"
+    elif start_date is not None and end_date is not None and start_date != "" and end_date != "":
+        start_date = start_date + " 00:00:00"
+        end_date = end_date + " 23:59:59"
+        query = query + " AND Flight.dept_date_time BETWEEN :start_date AND :end_date"
     
     try:
-        result = db.execute(query, {"email": email}, fetch=True)
+        result = db.execute(query, {"email": email, "start_date" : start_date, "end_date" : end_date}, fetch=True)
     except Exception as e:
+        print(e)
         return jsonify({"success": False, "error": "database error"})
     return jsonify({"success": True, "flights": result})
 

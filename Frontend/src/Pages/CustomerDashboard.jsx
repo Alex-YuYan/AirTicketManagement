@@ -16,7 +16,7 @@ const CustomerDashboard = () => {
     if (res.data && res.data.success === true) {
       setLoggedIn(false);
       setIsOpen(false);
-      naviagte('/');
+      navigate('/');
     } else {
       alert('Something went wrong.');
     }
