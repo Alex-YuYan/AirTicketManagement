@@ -100,7 +100,7 @@ const PurchaseButton = ({ flight, user }) => {
       name: 'card_number',
       label: 'Card Number',
       type: 'text',
-      validation: { required: true, pattern: /^[0-9]{13,19}$/ },
+      validation: { required: true },
     },
     {
       name: 'card_expiration',

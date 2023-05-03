@@ -44,7 +44,7 @@ const CustomerFlights = () => {
         alert("Successfully cancelled flight")
         navigate(0)
       } else {
-        alert(res.data.message)
+        alert(res.data.error)
       }
     }
     catch (error) {

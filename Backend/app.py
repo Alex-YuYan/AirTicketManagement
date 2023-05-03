@@ -582,16 +582,27 @@ def purchase_ticket():
 @customer_login_required
 def cancel_ticket():
     query = '''
-        DELETE FROM Ticket
+        SELECT * FROM Ticket
         WHERE id = :id
     '''
 
     id = request.json.get("id")
 
     try:
+        result = db.execute(query, {"id": id}, fetch=True)
+        if len(result) == 0:
+            return jsonify({"success": False, "error": "ticket does not exist"})
+        # Prevent deleting ticket that will depart in 24 hours
+        if (result[0]["dept_date_time"] - datetime.now()).total_seconds() < 86400:
+            return jsonify({"success": False, "error": "cannot cancel ticket within 24 hours"})
+        query = '''
+            DELETE FROM Ticket
+            WHERE id = :id
+        '''
         db.execute(query, {"id": id})
         return jsonify({"success": True})
     except Exception as e:
+        print(e)
         return jsonify({"success": False, "error": "database error"})
 
 @app.route("/customer/spending", methods=["GET"])
