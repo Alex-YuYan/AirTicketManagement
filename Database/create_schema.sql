@@ -51,6 +51,12 @@ CREATE TABLE `Airplane` (
   CONSTRAINT `airplane_ibfk_1` FOREIGN KEY (`airline_name`) REFERENCES `Airline` (`airline_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE VIEW Airplane_with_age AS
+SELECT
+    *,
+    TIMESTAMPDIFF(YEAR, manufacture_date, CURDATE()) AS age
+FROM
+    Airplane;
 
 -- flightmgr.Airport_Type definition
 
