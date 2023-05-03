@@ -565,6 +565,9 @@ def purchase_ticket():
     price = get_ticket_price(flight_number, dept_date_time, airline_name)
     
     try:
+        # Should not allow user to purchase previous flight
+        if datetime.strptime(dept_date_time, "%Y-%m-%d %H:%M:%S") < datetime.now():
+            return jsonify({"success": False, "error": "cannot purchase previous flight"})
         db.execute(query, {
             "email": email, "purchase_date_time": purchase_time,
             "airline_name": airline_name, "flight_number": flight_number, "dept_date_time": dept_date_time,
