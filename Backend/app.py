@@ -643,6 +643,8 @@ def get_flights():
                 SELECT * FROM Flight
                 WHERE airline_name = :airline_name AND dept_date_time >= :start_date AND dept_date_time <= :end_date
             '''
+        
+        query += " ORDER BY dept_date_time DESC"
         result = db.execute(query, {"airline_name": airline_name, "start_date": start_date, "end_date": end_date, "source": source, "destination": destination}, fetch=True)
         result = [dict(row) for row in result]
         for each in result:
